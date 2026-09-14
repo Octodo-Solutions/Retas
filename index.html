@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RWH concept design — Retas Enviro Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --paper:#EFF2F0; --sheet:#FBFCFB; --band:#E4E9E6;
+  --ink:#14211D; --ink2:#4E5F59; --ink3:#7C8B85;
+  --rule:#C3CCC7; --rule2:#DDE4E0;
+  --water:#0C6B70; --water-soft:#DCEBEB;
+  --sand:#A8762E; --sand-soft:#F2E8D6;
+  --fail:#A6382C; --fail-soft:#F6E3E0;
+  --pass:#2F6B45; --pass-soft:#E0EDE4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:Archivo,system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--water);outline-offset:2px;border-radius:2px}
+
+.masthead{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;padding:14px 26px;border-bottom:1px solid var(--rule);background:var(--sheet)}
+.brand{font-weight:700;letter-spacing:-.01em;font-size:15px}
+.brand span{color:var(--water)}
+.masthead .job{color:var(--ink2);font-size:13.5px}
+.masthead .job b{font-weight:600;color:var(--ink)}
+.masthead .spacer{flex:1}
+.revtag{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink3);border:1px solid var(--rule);border-radius:2px;padding:2px 7px}
+
+.shell{display:flex;align-items:stretch;min-height:calc(100vh - 53px)}
+.rail{width:228px;flex:none;padding:26px 0 40px;border-right:1px solid var(--rule);background:var(--sheet)}
+.rail h2{font-size:11.5px;font-weight:600;color:var(--ink3);padding:0 20px 14px}
+.scale{position:relative;padding-left:52px}
+.scale::before{content:"";position:absolute;left:34px;top:8px;bottom:8px;width:1px;background:var(--rule)}
+.lvl{position:relative;display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;padding:9px 14px 9px 0;color:var(--ink2);font-size:13.5px}
+.lvl::before{content:"";position:absolute;left:-22px;top:50%;width:13px;height:1px;background:var(--rule)}
+.lvl::after{content:"";position:absolute;left:-21px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--sheet);border:1px solid var(--rule)}
+.lvl .d{position:absolute;left:-52px;top:50%;transform:translateY(-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink3)}
+.lvl:hover{color:var(--ink)}
+.lvl.done{color:var(--ink)}
+.lvl.done::after{background:var(--water);border-color:var(--water)}
+.lvl.here{color:var(--ink);font-weight:600}
+.lvl.here::after{background:var(--water);border-color:var(--water);box-shadow:0 0 0 3px var(--water-soft)}
+.lvl[disabled]{cursor:not-allowed;color:var(--ink3)}
+
+.stage{flex:1;min-width:0;padding:30px 34px 64px;max-width:1240px}
+.stage-head{margin-bottom:22px;max-width:64ch}
+.stage-head h1{font-size:25px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.stage-head p{color:var(--ink2);margin-top:5px;font-size:14.5px}
+
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:3px}
+.panel + .panel{margin-top:16px}
+.panel > h3{font-size:13px;font-weight:600;padding:11px 16px;border-bottom:1px solid var(--rule2)}
+.panel > h3 .sub{font-weight:400;color:var(--ink3);margin-left:8px}
+.panel .body{padding:16px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.f{display:flex;flex-direction:column;gap:5px}
+.f label{font-size:12.5px;color:var(--ink2);font-weight:500}
+.f .hint{font-size:11.5px;color:var(--ink3);line-height:1.35}
+.f input,.f select{border:1px solid var(--rule);border-radius:2px;background:#fff;padding:7px 9px;font-size:14px;width:100%}
+.f input[type=number]{font-family:"IBM Plex Mono",monospace;text-align:right}
+.f input:focus,.f select:focus{border-color:var(--water)}
+.unit{position:relative}
+.unit input{padding-right:52px}
+.unit .u{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:11.5px;color:var(--ink3);font-family:"IBM Plex Mono",monospace;pointer-events:none}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:600;font-size:11.5px;color:var(--ink2);padding:8px 9px;border-bottom:1px solid var(--rule);white-space:nowrap;vertical-align:bottom}
+td{padding:6px 9px;border-bottom:1px solid var(--rule2);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.r{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+th.r{text-align:right}
+tbody tr:hover td{background:var(--band)}
+td input,td select{border:1px solid transparent;background:transparent;border-radius:2px;padding:4px 5px;width:100%;font-size:13.5px}
+td input:hover,td select:hover{border-color:var(--rule)}
+td input:focus,td select:focus{border-color:var(--water);background:#fff}
+td input[type=number]{font-family:"IBM Plex Mono",monospace;text-align:right}
+td.in{background:#FFFDF6}
+tbody tr:hover td.in{background:#FBF6E8}
+.sect td{background:var(--band);font-weight:600;font-size:12px;border-bottom:1px solid var(--rule)}
+tfoot td{border-top:1px solid var(--rule);font-weight:600;background:var(--sheet);border-bottom:0}
+.tblwrap{overflow-x:auto}
+.wide{min-width:1150px}
+
+.deriv{background:var(--band);border-left:2px solid var(--water);padding:10px 14px;margin-top:14px;border-radius:0 2px 2px 0}
+.deriv .k{font-size:11.5px;color:var(--ink2);margin-bottom:3px}
+.deriv .v{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.65;word-break:break-word}
+.deriv .v em{font-style:normal;color:var(--water);font-weight:600}
+
+.check{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-radius:2px;margin-bottom:8px;font-size:13.5px}
+.check:last-child{margin-bottom:0}
+.check .mark{flex:none;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px}
+.check .txt strong{display:block;font-weight:600;margin-bottom:2px}
+.check .txt span{color:var(--ink2);font-size:12.5px}
+.check.ok{background:var(--pass-soft)} .check.ok .mark{background:var(--pass)}
+.check.no{background:var(--fail-soft)} .check.no .mark{background:var(--fail)}
+.check.warn{background:var(--sand-soft)} .check.warn .mark{background:var(--sand)}
+
+.drop{border:1px dashed var(--rule);border-radius:3px;background:#fff;padding:24px 18px;text-align:center}
+.drop.has{border-style:solid;border-color:var(--water);background:var(--water-soft);text-align:left;display:flex;gap:12px;align-items:center}
+.drop .ico{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--water);color:var(--water);border-radius:2px;padding:2px 6px;flex:none}
+.drop p{font-size:13.5px;color:var(--ink2)}
+.drop b{color:var(--ink);font-weight:600}
+
+.actions{display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap}
+.actions .spacer{flex:1}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:9px 20px;border-radius:2px;font-size:14px;font-weight:500;cursor:pointer}
+.btn:hover{background:#000}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn.ghost:hover{background:var(--band)}
+.btn.small{padding:6px 12px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.note{font-size:12.5px;color:var(--ink3);max-width:52ch}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:11px;padding:1px 6px;border-radius:2px;background:var(--band);color:var(--ink2)}
+.tag.roof{background:var(--water-soft);color:var(--water)}
+.tag.paved{background:var(--sand-soft);color:var(--sand)}
+.tag.green{background:var(--pass-soft);color:var(--pass)}
+.draw svg{display:block;width:100%;height:auto;max-width:300px;margin:0 auto}
+.legend{font-size:11.5px;color:var(--ink3);padding:0 16px 14px}
+.outlist{list-style:none}
+.outlist li{display:flex;gap:11px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--rule2);font-size:13.5px}
+.outlist li:last-child{border-bottom:0}
+.outlist .ext{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink3);border:1px solid var(--rule);border-radius:2px;padding:1px 5px;flex:none}
+.outlist .sub{color:var(--ink3);font-size:12.5px}
+
+@media (max-width:900px){.grid3,.grid4{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){
+  .shell{flex-direction:column}
+  .rail{width:100%;border-right:0;border-bottom:1px solid var(--rule);padding:18px 0 22px}
+  .stage{padding:22px 18px 52px}
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">Retas <span>Enviro</span></div>
+  <div class="job">Concept design — <b id="mh-job">Mega Green City, Bareilly</b></div>
+  <div class="spacer"></div>
+  <div class="revtag">Rev B</div>
+</header>
+
+<div class="shell">
+  <nav class="rail"><h2>Design sequence</h2><div class="scale" id="rail"></div></nav>
+  <main class="stage" id="stage"></main>
+</div>
+
+<script>
+/* ================= CONSTANTS from the module sheet ================= */
+const PL = 0.683, PW = 0.41;                 // plate size, m
+const DEPTHS = {3:1.31, 4:1.74, 5:2.17};     // triple / quad / penta
+const STACK  = {3:"Triple", 4:"Quad", 5:"Penta"};
+const PLATES = {1:[4,4], 2:[7,8], 3:[10,12], 4:[13,16], 5:[16,20]};
+const COEF = {roof:0.9, paved:0.7, green:0.2};
+const COVER = 0.57;                          // company standard cover constant
+
+const S = {
+  step:0, seen:0, approved:false, uploaded:true,
+  project:{ name:"Mega Green City, Bareilly", client:"Mega Green Developers", city:"Bareilly" },
+  rain:{ intensity:20, duration:1 },
+  nTanks:3,
+  zones:[
+    {id:1, name:"RWH-1", roof:5755,  paved:15395, green:1035, layers:4, nl:39, nw:17, bores:3, bdepth:30, invert:1.0},
+    {id:2, name:"RWH-2", roof:15958, paved:8424,  green:5112, layers:4, nl:46, nw:19, bores:3, bdepth:30, invert:1.0},
+    {id:3, name:"RWH-3", roof:13083, paved:13569, green:4445, layers:3, nl:55, nw:22, bores:3, bdepth:30, invert:1.0}
+  ],
+  dc:{ L:3, W:2.5, D:3, wall:0.25, pcc:0.1, slab:0.15, baffle:0.2 },
+  fc:{ L:2, W:1.5, D:2, wall:0.25, pcc:0.1 },
+  region:"Agra, Kanpur, Bihar and Lucknow"
+};
+
+const STEPS = [
+  {d:"0.0", t:"Project and drawing",  p:"Basic details, the client's landscape drawing, and how many tanks the scheme needs."},
+  {d:"0.5", t:"Zones for review",     p:"Areas read off the drawing for each tank. Check them, correct anything wrong, then approve."},
+  {d:"1.0", t:"Volume and sizing",    p:"Runoff volume per tank, then module counts solved to L, W and H."},
+  {d:"1.5", t:"Tank calculations",    p:"Borewells and invert level are yours. Dimensions carry through and stay editable."},
+  {d:"2.0", t:"Total calculation",    p:"Every tank on one line, in the column order the BOQ reads from."},
+  {d:"2.5", t:"Chambers",             p:"Desilting and filter chamber quantities, and the civil works summary."},
+  {d:"3.0", t:"Bill of quantities",   p:"Recharge tank with brick masonry desilting chamber."}
+];
+
+/* ================= HELPERS ================= */
+const $ = s => document.querySelector(s);
+const n = (v,d=0) => (isFinite(v)?Number(v):0).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+const inr = v => "₹"+Number(Math.round(v||0)).toLocaleString("en-IN");
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rainM = () => S.rain.intensity * S.rain.duration / 1000;
+
+/* ================= SIZING — Bareilly sheet ================= */
+function potential(z){
+  const r = z.roof*COEF.roof*rainM(), p = z.paved*COEF.paved*rainM(), g = z.green*COEF.green*rainM();
+  return { r, p, g, total:r+p+g, area:z.roof+z.paved+z.green };
+}
+/* Solve module grid: minimise |V - Vreq| within a workable aspect */
+function solveGrid(vReq, layers){
+  const H = DEPTHS[layers]; let best=null;
+  for(let nl=1; nl<=140; nl++){
+    for(let nw=1; nw<=70; nw++){
+      const L=nl*PL, W=nw*PW;
+      const asp = L/W; if(asp<1.5||asp>5) continue;
+      const v = L*W*H, d = Math.abs(v-vReq);
+      if(!best || d<best.d) best={nl,nw,v,d};
+    }
+  }
+  return best || {nl:1,nw:1,v:PL*PW*H,d:0};
+}
+function tankOf(z){
+  const H = DEPTHS[z.layers], L = z.nl*PL, W = z.nw*PW;
+  const boxes = z.nl*z.nw, [lg,sm] = PLATES[z.layers];
+  return { ...z, H, L:+L.toFixed(3), W:+W.toFixed(3), V:L*W*H, boxes, large:boxes*lg, small:boxes*sm };
+}
+
+/* ================= PER-TANK TAKE-OFF — RWH-n sheet ================= */
+function calc(z){
+  const t = tankOf(z), {L,W,H} = t;
+  const D = z.invert + 0.2 + COVER + H + 0.2;
+  const aBot=(L+1)*(W+1), aTop=(L+2)*(W+2);
+  const exc=((aTop*D)+(aBot*D))/2;
+  const vol=L*W*H;
+  const geo=(2*(L*W)+2*(W*H)+2*(H*L))*1.3;
+  const geoBase=aBot*1.1;
+  const agg=aBot*0.1, sand=aBot*0.1 + L*W*0.2;
+  const back=exc-vol-sand-agg;
+  const gravel=((3.14*0.15*0.15)-(3.14*0.075*0.075))*z.bdepth*35.314*z.bores;
+  return { ...t, D, vol, geo, geoBase, agg, sand, back, exc,
+    dress:aBot, boreTot:z.bores*z.bdepth, pipeTot:z.bores*z.bdepth,
+    plain:z.bores*z.bdepth*0.4, slot:z.bores*z.bdepth*0.6,
+    gravel, ports:Math.max(1,Math.ceil(D/1.5)),
+    micro:Math.max(1,Math.ceil(L*W/60)), horiz:0 };
+}
+const allCalc = () => S.zones.map(calc);
+const sum = k => allCalc().reduce((a,t)=>a+(t[k]||0),0);
+
+/* ================= CHAMBERS — Desilting sheet ================= */
+function chamber(c, withRcc){
+  const oL=c.L+2*c.wall, oW=c.W+2*c.wall;
+  const exc=(oL+1)*(oW+1)*(c.D+c.pcc+(withRcc?c.slab:0));
+  const pcc=(oL+0.6)*(oW+0.6)*c.pcc;
+  const brick=(oL*oW*c.D)-(c.L*c.W*c.D);
+  const baffle=withRcc?(c.L*c.D*(c.baffle||0.2)):0;
+  const plaster=((oL+oW)*c.D)*2+((c.L+c.W)*c.D)*2;
+  const rcc=withRcc?oL*oW*c.slab:0;
+  const shut=withRcc?(c.L*c.W)+((oL+oW)*2*c.slab):0;
+  const bars10=withRcc?(((oL/0.15)+1)*oW)*0.617*2:0;
+  const bars8 =withRcc?(((oW/0.15)+1)*oL)*0.398*2:0;
+  return { exc, pcc, brick:brick+baffle, plaster, rcc, shut, steel:bars10+bars8 };
+}
+function summary(){
+  const d=chamber(S.dc,true), f=chamber(S.fc,false);
+  return [
+    {n:"Excavation", d:d.exc,  f:f.exc,  u:"Cum"},
+    {n:"PCC",        d:d.pcc,  f:f.pcc,  u:"Cum"},
+    {n:"Brick work", d:d.brick,f:f.brick,u:"Cum"},
+    {n:"Plaster",    d:d.plaster,f:f.plaster,u:"Sqm"},
+    {n:"RCC",        d:d.rcc,  f:0,      u:"Cum"},
+    {n:"Steel",      d:d.steel,f:0,      u:"kg"},
+    {n:"Shuttering", d:d.shut, f:0,      u:"Sqm"}
+  ].map(r=>({...r, t:r.d+r.f}));
+}
+
+/* ================= BOQ ================= */
+const R = {bore:650,plain:950,slot:1150,gravel:85,comp:15000,cap:300,exc:280,dress:35,memb:95,agg:1850,sand:1450,mod:8200,inst:950,geo:110,geofix:25,frp:12500,frpext:3200,inline:9500,pvc:690,elb:340,back:185,dcexc:310,dcpcc:5400,dcbrick:6800,dcplas:265,dcsteel:78,dcshut:420,dcrcc:8900,foot:850,cover:4200};
+function boq(){
+  const s=summary(), P=k=>sum(k), frp=P("micro");
+  const G=[
+    {h:"1", d:"SITE MOBILISATION & SAFETY MEASURES"},
+    {s:"1.1", d:"Setting up site office and store at site", u:"Lumpsum", q:1, r:45000},
+    {s:"1.2", d:"Hard barricading using scaffolding around the excavated area", u:"Lumpsum", q:1, r:68000},
+    {s:"1.3", d:"Labour camp, water supply and mobile toilet", u:"Lumpsum", q:1, r:52000},
+    {h:"2", d:"DEWATERING WORK"},
+    {s:"2.1", d:"Dewatering of surface / shallow water for foundation of RWH tank", u:"Lumpsum", q:1, r:38000},
+    {h:"3", d:"BOREWELL DRILLING WORKS"},
+    {s:"3.1.a", d:"Boring / drilling borewell of required dia — normal soil", u:"Meter", q:P("boreTot"), r:R.bore},
+    {s:"3.1.b", d:"Boring / drilling borewell — rocks and boulders", u:"Meter", q:0, r:1250},
+    {s:"3.2", d:"160 mm dia plain casing pipe, lowered and fixed vertically", u:"Meter", q:P("plain"), r:R.plain},
+    {s:"3.3", d:"160 mm dia slotted screen pipe, lowered and fixed vertically", u:"Meter", q:P("slot"), r:R.slot},
+    {s:"3.4", d:"Gravel / stone chips in tubewell as per actual requirement", u:"cft", q:P("gravel"), r:R.gravel},
+    {s:"3.5", d:"Compressor cleaning of borewell", u:"Job", q:S.zones.reduce((a,z)=>a+z.bores,0), r:R.comp},
+    {s:"3.6", d:"Supply and fixing of end cap", u:"Nos", q:S.zones.reduce((a,z)=>a+z.bores,0), r:R.cap},
+    {h:"4", d:"EARTHWORK"},
+    {s:"4.1.a", d:"Earthwork in excavation by mechanical means — normal soil", u:"Cum", q:P("exc"), r:R.exc},
+    {s:"4.1.b", d:"Earthwork in excavation — silt and clay", u:"Cum", q:0, r:315},
+    {s:"4.1.c", d:"Earthwork in excavation — sandy soil", u:"Cum", q:0, r:295},
+    {s:"4.1.d", d:"Earthwork in excavation — rocks and boulders", u:"Cum", q:0, r:640},
+    {s:"4.2", d:"Surface dressing of the ground including removing vegetation", u:"Sq.m", q:P("dress"), r:R.dress},
+    {s:"4.3", d:"Membrane to lower aggregate penetration impact over soil", u:"Sq.m", q:P("geoBase"), r:R.memb},
+    {s:"4.4", d:"Stone aggregate 20 mm to 40 mm nominal gauge in the base", u:"Cum", q:P("agg"), r:R.agg},
+    {s:"4.5", d:"Local sand, 200 mm bed over tank and sides", u:"Cum", q:P("sand"), r:R.sand},
+    {h:"5", d:"RAINWATER HARVESTING TANK"},
+    {s:"5.1", d:"Supply of polymer based RWH modules — Rainmaxx Smart", u:"Cum", q:P("vol"), r:R.mod},
+    {s:"5.1.a", d:"Installation of polymer based RWH modules", u:"Cum", q:P("vol"), r:R.inst},
+    {s:"5.2", d:"PP non-woven geotextile 400 GSM", u:"Sqm", q:P("geo"), r:R.geo},
+    {s:"5.2.a", d:"Fixing of PP non-woven geotextile 400 GSM", u:"Sqm", q:P("geo"), r:R.geofix},
+    {s:"5.3", d:'FRP filter 6" dia with SS 304 mesh bracket', u:"Nos", q:frp, r:R.frp},
+    {s:"5.4", d:"FRP filter extension to access internal filtration system", u:"Nos", q:P("ports"), r:R.frpext},
+    {s:"5.5", d:"Inline filter (single screen)", u:"Nos", q:P("horiz"), r:R.inline},
+    {s:"5.6", d:"PVC pipes — desilting chamber to filters and filters to tank", u:"Meter", q:frp*3, r:R.pvc},
+    {s:"5.7", d:"PVC elbows — connection of filters to tank", u:"Nos", q:frp, r:R.elb},
+    {s:"5.8", d:"Filling available excavated earth, in layers, watered and rammed", u:"Cum", q:P("back"), r:R.back},
+    {h:"6", d:"DESILTING CHAMBER & OTHER CIVIL WORKS"},
+    {s:"6.1", d:"Earthwork in excavation for chambers", u:"Cum", q:s[0].t, r:R.dcexc},
+    {s:"6.2", d:"PCC in foundation 1:4:8", u:"Cum", q:s[1].t, r:R.dcpcc},
+    {s:"6.2.a", d:"Brickwork with common burnt clay FPS bricks in cement mortar", u:"Cum", q:s[2].t, r:R.dcbrick},
+    {s:"6.2.b", d:"12 mm cement plaster of mix 1:6 with neat cement punning", u:"Sqm", q:s[3].t, r:R.dcplas},
+    {s:"6.3", d:"Reinforcement work — providing, shifting, placing", u:"KG", q:s[5].t, r:R.dcsteel},
+    {s:"6.4", d:"Shuttering — centering and shuttering for concrete", u:"Sq.m", q:s[6].t, r:R.dcshut},
+    {s:"6.5", d:"Concrete work — 230 mm thick RCC top slab 1:2:4", u:"Cum", q:s[4].t, r:R.dcrcc},
+    {s:"6.6", d:"Supply and fixing of footrest", u:"Nos", q:S.zones.length*3, r:R.foot},
+    {s:"6.7", d:"Pre-cast RCC manhole cover and frame", u:"Nos", q:S.zones.length, r:R.cover}
+  ];
+  G.forEach(g=>{ if(g.s) g.a=(g.q||0)*(g.r||0); });
+  const sub=G.filter(g=>g.s).reduce((a,g)=>a+g.a,0);
+  return {rows:G, sub, gst:sub*0.18, tot:sub*1.18};
+}
+
+/* ================= SECTION DRAWING ================= */
+function section(t){
+  if(!t) return "";
+  const inv=t.invert, H=t.H, D=t.D;
+  const TOP=22, BOT=232, PPM=(BOT-TOP)/D, y=m=>TOP+m*PPM;
+  const x0=52, x1=238;
+  const tankTop=inv+0.2+COVER;
+  return `<svg viewBox="0 0 300 268" xmlns="http://www.w3.org/2000/svg" role="img"
+    aria-label="Section through the pit showing the depth build-up">
+  <defs><pattern id="soil" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+    <line x1="0" y1="0" x2="0" y2="7" stroke="var(--rule)" stroke-width="1"/></pattern></defs>
+  <rect x="${x0}" y="${TOP}" width="${x1-x0}" height="${BOT-TOP}" fill="url(#soil)" opacity=".45"/>
+  <line x1="${x0-22}" y1="${TOP}" x2="${x1+6}" y2="${TOP}" stroke="var(--ink)" stroke-width="1.2"/>
+  <text x="${x0-24}" y="${TOP-5}" font-size="8.5" fill="var(--ink2)" font-family="IBM Plex Mono">FGL</text>
+  <line x1="${x0-22}" y1="${y(inv)}" x2="${x1+6}" y2="${y(inv)}" stroke="var(--sand)" stroke-width="1" stroke-dasharray="5 3"/>
+  <circle cx="${x0-12}" cy="${y(inv)}" r="4" fill="none" stroke="var(--sand)" stroke-width="1.2"/>
+  <text x="${x1+8}" y="${y(inv)+3}" font-size="8" fill="var(--sand)" font-family="IBM Plex Mono">inv ${n(inv,2)}</text>
+  <rect x="${x0}" y="${y(inv)}" width="${x1-x0}" height="${(0.2+COVER)*PPM}" fill="var(--band)" stroke="var(--rule)" stroke-width=".5"/>
+  <text x="${x1+8}" y="${y(inv)+(0.2+COVER)*PPM/2+3}" font-size="8" fill="var(--ink3)" font-family="IBM Plex Mono">0.77</text>
+  <rect x="${x0}" y="${y(tankTop)}" width="${x1-x0}" height="${H*PPM}" fill="var(--water-soft)" stroke="var(--water)" stroke-width="1"/>
+  ${Array.from({length:t.layers-1},(_,i)=>`<line x1="${x0}" y1="${y(tankTop+(i+1)*H/t.layers)}" x2="${x1}" y2="${y(tankTop+(i+1)*H/t.layers)}" stroke="var(--water)" stroke-width=".4" opacity=".5"/>`).join("")}
+  <text x="${(x0+x1)/2}" y="${y(tankTop)+H*PPM/2+3}" font-size="9.5" text-anchor="middle" fill="var(--water)" font-family="IBM Plex Mono" font-weight="600">${n(H,2)} m</text>
+  <rect x="${x0}" y="${y(tankTop+H)}" width="${x1-x0}" height="${0.2*PPM}" fill="var(--sand-soft)" stroke="var(--sand)" stroke-width=".5"/>
+  <text x="${x1+8}" y="${y(tankTop+H)+0.2*PPM/2+3}" font-size="8" fill="var(--sand)" font-family="IBM Plex Mono">0.20</text>
+  <line x1="${x0-30}" y1="${TOP}" x2="${x0-30}" y2="${BOT}" stroke="var(--ink2)" stroke-width=".8"/>
+  <line x1="${x0-34}" y1="${TOP}" x2="${x0-26}" y2="${TOP}" stroke="var(--ink2)" stroke-width=".8"/>
+  <line x1="${x0-34}" y1="${BOT}" x2="${x0-26}" y2="${BOT}" stroke="var(--ink2)" stroke-width=".8"/>
+  <text x="${x0-38}" y="${(TOP+BOT)/2}" font-size="8.5" fill="var(--ink2)" font-family="IBM Plex Mono"
+    text-anchor="middle" transform="rotate(-90 ${x0-38} ${(TOP+BOT)/2})">${n(D,2)} m</text>
+  <text x="${x0-24}" y="${BOT+20}" font-size="8.5" fill="var(--ink3)" font-family="IBM Plex Mono">${esc(t.name)} — ${n(t.L,2)} × ${n(t.W,2)}</text>
+</svg>`;
+}
+
+/* ================= RAIL / CHROME ================= */
+function drawRail(){
+  $("#rail").innerHTML = STEPS.map((s,i)=>{
+    const cls=i===S.step?"here":i<=S.seen?"done":"";
+    return `<button class="lvl ${cls}" ${i>S.seen?"disabled":""} onclick="go(${i})"><span class="d">${s.d}</span>${esc(s.t)}</button>`;
+  }).join("");
+  $("#mh-job").textContent = S.project.name || "Untitled project";
+}
+const head = () => `<div class="stage-head"><h1>${esc(STEPS[S.step].t)}</h1><p>${esc(STEPS[S.step].p)}</p></div>`;
+const nav = (label,ok=true) => `<div class="actions">
+  ${S.step>0?`<button class="btn ghost" onclick="go(${S.step-1})">Back</button>`:""}
+  <div class="spacer"></div>
+  ${S.step<STEPS.length-1?`<button class="btn" ${ok?"":"disabled"} onclick="go(${S.step+1})">${label||"Continue"}</button>`:""}
+</div>`;
+
+/* ================= STAGE 0 — project + drawing ================= */
+function stage0(){
+  return head()+`
+  <div class="panel"><h3>Project</h3><div class="body">
+    <div class="grid3">
+      <div class="f"><label for="pn">Project</label><input id="pn" value="${esc(S.project.name)}" oninput="set('project.name',this.value)"></div>
+      <div class="f"><label for="pc">Client</label><input id="pc" value="${esc(S.project.client)}" oninput="set('project.client',this.value)"></div>
+      <div class="f"><label for="pl">Location</label><input id="pl" value="${esc(S.project.city)}" oninput="set('project.city',this.value)"></div>
+    </div>
+  </div></div>
+
+  <div class="panel"><h3>Rainfall</h3><div class="body">
+    <div class="grid3">
+      <div class="f"><label for="ri">Rainfall intensity</label>
+        <div class="unit"><input id="ri" type="number" value="${S.rain.intensity}" oninput="set('rain.intensity',+this.value)"><span class="u">mm/hr</span></div></div>
+      <div class="f"><label for="rd">Duration</label>
+        <div class="unit"><input id="rd" type="number" step="0.25" value="${S.rain.duration}" oninput="set('rain.duration',+this.value)"><span class="u">hr</span></div></div>
+      <div class="f"><label>Total rainfall</label>
+        <div class="unit"><input value="${n(rainM(),3)}" readonly style="background:var(--band)"><span class="u">m</span></div>
+        <div class="hint">Carried into every zone calculation.</div></div>
+    </div>
+    <div class="deriv"><div class="k">Rainfall depth</div>
+      <div class="v">${n(S.rain.intensity)} mm/hr × ${n(S.rain.duration,2)} hr ÷ 1000 = <em>${n(rainM(),3)} m</em></div></div>
+  </div></div>
+
+  <div class="panel"><h3>Client drawing</h3><div class="body">
+    <div class="drop ${S.uploaded?"has":""}" onclick="upload()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')upload()">
+      ${S.uploaded
+        ? `<span class="ico">DWG</span><p><b>MEGA_GREEN_CITY_LANDSCAPE_R3.dwg</b><br><span class="note">4.2 MB — layers read, zones ready to extract</span></p>`
+        : `<p><b>Drop the landscape drawing here</b><br><span class="note">DWG or DXF. Areas are read from closed boundaries by layer.</span></p>`}
+    </div>
+    <div class="grid3" style="margin-top:16px">
+      <div class="f"><label for="nt">RWH tanks required</label>
+        <input id="nt" type="number" min="1" max="12" value="${S.nTanks}" oninput="setTanks(+this.value)">
+        <div class="hint">The drawing is split into this many zones, each draining to one tank.</div></div>
+    </div>
+  </div></div>`
+  + nav("Extract zones", S.uploaded && S.nTanks>0);
+}
+
+/* ================= STAGE 1 — zones ================= */
+function stage1(){
+  const rows = S.zones.map(z=>{
+    const p=potential(z);
+    return `<tr>
+      <td><input value="${esc(z.name)}" oninput="ez(${z.id},'name',this.value)"></td>
+      <td class="in"><input type="number" value="${z.roof}" oninput="ez(${z.id},'roof',+this.value)"></td>
+      <td class="in"><input type="number" value="${z.paved}" oninput="ez(${z.id},'paved',+this.value)"></td>
+      <td class="in"><input type="number" value="${z.green}" oninput="ez(${z.id},'green',+this.value)"></td>
+      <td class="r">${n(p.area)}</td>
+      <td class="r">${n(p.total,2)}</td>
+    </tr>`;}).join("");
+  const tA=S.zones.reduce((a,z)=>a+potential(z).area,0);
+  const tV=S.zones.reduce((a,z)=>a+potential(z).total,0);
+
+  return head()+`
+  <div class="check ${S.approved?"ok":"warn"}">
+    <span class="mark">${S.approved?"✓":"!"}</span>
+    <span class="txt"><strong>${S.approved?"Zones approved":"Read from the drawing — not yet approved"}</strong>
+    <span>${S.approved?"Sizing will use these figures.":"Boundaries are picked up by layer, so anything untagged in the client's drawing lands short. Check each figure against the plan before approving."}</span></span></div>
+
+  <div class="panel"><h3>Zone areas <span class="sub">yellow cells are editable</span></h3>
+    <div class="tblwrap"><table>
+      <thead><tr><th>Zone</th><th class="r">Rooftop (sqm)</th><th class="r">Paved (sqm)</th>
+        <th class="r">Green (sqm)</th><th class="r">Total area</th><th class="r">Potential (cum)</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td>Total</td><td colspan="3"></td><td class="r">${n(tA)}</td><td class="r">${n(tV,2)}</td></tr></tfoot>
+    </table></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn ghost" onclick="go(0)">Back</button>
+    <div class="spacer"></div>
+    ${S.approved
+      ? `<button class="btn" onclick="go(2)">Continue to sizing</button>`
+      : `<button class="btn" onclick="approve()">Approve areas</button>`}
+  </div>`;
+}
+
+/* ================= STAGE 2 — volume + module sizing ================= */
+function stage2(){
+  const blocks = S.zones.map(z=>{
+    const p=potential(z), t=tankOf(z), fit=(t.V-p.total);
+    const row=(nm,a,c,v)=>`<tr><td>${nm}</td><td>Sqm</td><td class="r">${n(a)}</td>
+      <td class="r">${c.toFixed(2)}</td><td class="r">${n(rainM(),3)}</td><td class="r">${n(v,2)}</td></tr>`;
+    return `<div class="panel"><h3>${esc(z.name)}</h3>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Particular</th><th>UOM</th><th class="r">Area</th><th class="r">Coefficient</th>
+          <th class="r">Rainfall (m)</th><th class="r">Total (cum)</th></tr></thead>
+        <tbody>
+          ${row("Rooftop area",z.roof,COEF.roof,p.r)}
+          ${row("Paved area",z.paved,COEF.paved,p.p)}
+          ${row("Green area",z.green,COEF.green,p.g)}
+        </tbody>
+        <tfoot><tr><td colspan="2">Total</td><td class="r">${n(p.area)}</td><td colspan="2"></td><td class="r">${n(p.total,2)}</td></tr></tfoot>
+      </table></div>
+      <div class="body" style="border-top:1px solid var(--rule2)">
+        <div class="grid4">
+          <div class="f"><label>Module stack</label>
+            <select onchange="ez(${z.id},'layers',+this.value); autoGrid(${z.id})">
+              ${[3,4,5].map(k=>`<option value="${k}" ${z.layers===k?"selected":""}>${STACK[k]} — ${DEPTHS[k]} m</option>`).join("")}
+            </select></div>
+          <div class="f"><label>Modules along L</label><input type="number" value="${z.nl}" oninput="ez(${z.id},'nl',+this.value)"></div>
+          <div class="f"><label>Modules along W</label><input type="number" value="${z.nw}" oninput="ez(${z.id},'nw',+this.value)"></div>
+          <div class="f"><label>&nbsp;</label><button class="btn ghost small" onclick="autoGrid(${z.id})">Solve grid</button></div>
+        </div>
+        <div class="deriv"><div class="k">Tank size from module count</div>
+          <div class="v">L ${z.nl} × ${PL} = ${n(t.L,3)} m &nbsp; W ${z.nw} × ${PW} = ${n(t.W,3)} m &nbsp; H ${n(t.H,2)} m
+            → <em>${n(t.V,2)} cum</em> against ${n(p.total,2)} required (${fit>=0?"+":""}${n(fit,2)})<br>
+            ${t.boxes} boxes → ${n(t.large)} large plates, ${n(t.small)} small plates</div></div>
+      </div>
+    </div>`;}).join("");
+
+  const totV=S.zones.reduce((a,z)=>a+tankOf(z).V,0);
+  const reqV=S.zones.reduce((a,z)=>a+potential(z).total,0);
+  return head()+blocks+`
+  <div class="panel"><h3>Sizing summary</h3>
+    <div class="tblwrap"><table>
+      <thead><tr><th>Tank</th><th class="r">Length (m)</th><th class="r">Width (m)</th>
+        <th class="r">Height (m)</th><th class="r">Volume (cum)</th></tr></thead>
+      <tbody>${S.zones.map(z=>{const t=tankOf(z);return `<tr><td>${esc(z.name)}</td>
+        <td class="r">${n(t.L,3)}</td><td class="r">${n(t.W,2)}</td>
+        <td class="r">${n(t.H,2)}</td><td class="r">${n(t.V,3)}</td></tr>`;}).join("")}</tbody>
+      <tfoot><tr><td colspan="4">Total against ${n(reqV,2)} cum required</td><td class="r">${n(totV,3)}</td></tr></tfoot>
+    </table></div>
+  </div>`+nav();
+}
+
+/* ================= STAGE 3 — per-tank calculations ================= */
+function stage3(){
+  const T=allCalc();
+  const blocks=S.zones.map((z,i)=>{
+    const t=T[i];
+    const line=(a,b,c,d)=>`<tr><td>${a}</td><td>${b}</td><td class="r">${c}</td>${d?`<td class="note" style="font-size:11.5px">${d}</td>`:"<td></td>"}</tr>`;
+    return `<div class="panel"><h3>${esc(z.name)}</h3><div class="body">
+      <div class="grid4">
+        <div class="f"><label>Length (m)</label><input type="number" step="0.001" value="${t.L}" oninput="ez(${z.id},'fixL',+this.value)"></div>
+        <div class="f"><label>Width (m)</label><input type="number" step="0.01" value="${t.W}" oninput="ez(${z.id},'fixW',+this.value)"></div>
+        <div class="f"><label>Height (m)</label><input type="number" step="0.01" value="${t.H}" readonly style="background:var(--band)"></div>
+        <div class="f"><label>Invert level (m)</label><input type="number" step="0.1" value="${z.invert}" oninput="ez(${z.id},'invert',+this.value)"></div>
+      </div>
+      <div class="grid4" style="margin-top:12px">
+        <div class="f"><label>Number of borewells</label><input type="number" value="${z.bores}" oninput="ez(${z.id},'bores',+this.value)"></div>
+        <div class="f"><label>Depth of borewell (m)</label><input type="number" value="${z.bdepth}" oninput="ez(${z.id},'bdepth',+this.value)"></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table>
+      <thead><tr><th style="width:40%">Item</th><th>Unit</th><th class="r">Quantity</th><th>Formula</th></tr></thead>
+      <tbody>
+        ${line("Module volume","Cum",n(t.vol,3),"L × W × H")}
+        ${line("Geotextile","Sqm",n(t.geo,3),"(2LW + 2WH + 2HL) × 1.3")}
+        ${line("Geotextile for base","Sqm",n(t.geoBase,3),"(L+1)(W+1) × 1.1")}
+        ${line("Total depth","m",n(t.D,2),`invert + 0.20 + ${COVER} + H + 0.20`)}
+        ${line("Excavation and disposal","Cum",n(t.exc,3),"mean of (L+2)(W+2)D and (L+1)(W+1)D")}
+        ${line("Aggregate 40 mm for base","Cum",n(t.agg,3),"(L+1)(W+1) × 0.1")}
+        ${line("Sand for base and tank top","Cum",n(t.sand,3),"(L+1)(W+1) × 0.1 + LW × 0.2")}
+        ${line("Backfilling","Cum",n(t.back,3),"excavation − volume − sand − aggregate")}
+        ${line("Surface dressing","Sqm",n(t.dress,3),"(L+1)(W+1)")}
+        ${line("Depth of borewell","m",n(t.boreTot,0),"bores × depth")}
+        ${line("160 mm plain casing","m",n(t.plain,0),"40% of bore length")}
+        ${line("160 mm slotted screen","m",n(t.slot,0),"60% of bore length")}
+        ${line("Gravel in borewell","cft",n(t.gravel,3),"(πr²bore − πr²pipe) × depth × 35.314 × bores")}
+        ${line("FRP inspection ports","Nos",n(t.ports,0),"⌈total depth ÷ 1.5⌉")}
+      </tbody>
+    </table></div></div>`;}).join("");
+
+  return head()+`
+  <div class="check warn"><span class="mark">!</span><span class="txt">
+    <strong>${COVER} m cover carried from your standard</strong>
+    <span>Total depth is invert + 0.20 + ${COVER} + H + 0.20, the same stack used in the module calculation sheet.</span></span></div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start">
+    <div>${blocks}</div>
+    <div class="panel" style="position:sticky;top:18px">
+      <h3>Section — ${esc(T[0].name)}</h3>
+      <div class="body draw">${section(T[0])}</div>
+      <div class="legend">Depth stack as built by the formula above.</div>
+    </div>
+  </div>`+nav();
+}
+
+/* ================= STAGE 4 — total calculation ================= */
+function stage4(){
+  const T=allCalc();
+  const cols=[["Length (m)","L",3],["Width (m)","W",2],["Height (m)","H",2],
+    ["Supply Rainmaxx (cum)","vol",2],["Installation (cum)","vol",2],
+    ["Geotextile (sqm)","geo",2],["Geotex base (sqm)","geoBase",2],
+    ["Micro filter","micro",0],["Horiz. filter","horiz",0],
+    ["Borewell (no.)","bores",0],["Depth of borewell","boreTot",0],["Depth of pipe","pipeTot",0],
+    ["160 screen (m)","slot",0],["160 pipe (m)","plain",0],["Gravel (cft)","gravel",2],
+    ["Excavation (cum)","exc",2],["Aggregate (cum)","agg",2],["Sand (cum)","sand",2],
+    ["Backfilling (cum)","back",2],["Invert level","invert",2],["Total depth","D",2],
+    ["Surface dressing","dress",2],["FRP inspection","ports",0]];
+  return head()+`
+  <div class="panel"><h3>Total calculation <span class="sub">column order as the BOQ reads it</span></h3>
+    <div class="tblwrap"><table class="wide">
+      <thead><tr><th>Pit</th>${cols.map(c=>`<th class="r">${c[0]}</th>`).join("")}</tr></thead>
+      <tbody>${T.map((t,i)=>`<tr><td>Pit ${i+1}</td>${cols.map(c=>`<td class="r">${n(t[c[1]],c[2])}</td>`).join("")}</tr>`).join("")}</tbody>
+      <tfoot><tr><td>Total</td>${cols.map(c=>{
+        const skip=["L","W","H","invert","D"].includes(c[1]);
+        return `<td class="r">${skip?"—":n(T.reduce((a,t)=>a+t[c[1]],0),c[2])}</td>`;}).join("")}</tr></tfoot>
+    </table></div>
+  </div>
+  <p class="note" style="margin-top:12px">Totals from this row feed the quantity column of the bill. Dimensions are not summed.</p>`+nav();
+}
+
+/* ================= STAGE 5 — chambers ================= */
+function stage5(){
+  const s=summary();
+  const f=(o,k,l,st)=>`<div class="f"><label>${l}</label><input type="number" step="${st||0.05}" value="${o[k]}" oninput="setC('${o===S.dc?"dc":"fc"}','${k}',+this.value)"></div>`;
+  return head()+`
+  <div class="grid2">
+    <div class="panel"><h3>Desilting chamber</h3><div class="body">
+      <div class="grid3">${f(S.dc,"L","Effective length (m)")}${f(S.dc,"W","Effective width (m)")}${f(S.dc,"D","Depth (m)")}</div>
+      <div class="grid3" style="margin-top:12px">${f(S.dc,"wall","Wall thickness (m)")}${f(S.dc,"pcc","PCC thickness (m)")}${f(S.dc,"slab","RCC slab (m)")}</div>
+    </div></div>
+    <div class="panel"><h3>Filter chamber</h3><div class="body">
+      <div class="grid3">${f(S.fc,"L","Effective length (m)")}${f(S.fc,"W","Effective width (m)")}${f(S.fc,"D","Depth (m)")}</div>
+      <div class="grid3" style="margin-top:12px">${f(S.fc,"wall","Wall thickness (m)")}${f(S.fc,"pcc","PCC thickness (m)")}</div>
+    </div></div>
+  </div>
+  <div class="panel"><h3>Summary of item</h3>
+    <div class="tblwrap"><table>
+      <thead><tr><th>SN</th><th>Description of item</th><th class="r">Desilting-1</th>
+        <th class="r">Filter ch.-1</th><th>Unit</th><th class="r">Total</th></tr></thead>
+      <tbody>${s.map((r,i)=>`<tr><td>${i+1}</td><td>${r.n}</td>
+        <td class="r">${n(r.d,3)}</td><td class="r">${r.f?n(r.f,3):"—"}</td>
+        <td>${r.u}</td><td class="r">${n(r.t,3)}</td></tr>`).join("")}</tbody>
+    </table></div>
+  </div>
+  <div class="check ok" style="margin-top:16px"><span class="mark">✓</span><span class="txt">
+    <strong>Steel bar references corrected</strong>
+    <span>The template cross-references the 10 mm and 8 mm bar dimensions (M8 reads L9, M9 reads L8). Both now read their own chamber dimensions, at 0.617 and 0.398 kg/m.</span></span></div>`+nav("Generate BOQ");
+}
+
+/* ================= STAGE 6 — BOQ ================= */
+function stage6(){
+  const b=boq(), regions=["Delhi, Faridabad, Noida, Ghaziabad","East Region","Agra, Kanpur, Bihar and Lucknow","Punjab","Kolkata, Jharkhand and Orissa"];
+  return head()+`
+  <div class="panel"><h3>Rate schedule</h3><div class="body">
+    <div class="grid3"><div class="f"><label for="rg">Region</label>
+      <select id="rg" onchange="set('region',this.value)">${regions.map(r=>`<option ${S.region===r?"selected":""}>${esc(r)}</option>`).join("")}</select>
+      <div class="hint">Rates shown are indicative. The live tool reads the regional schedule.</div></div></div>
+  </div></div>
+
+  <div class="panel"><h3>Bill of quantity — recharge tank with brick masonry desilting chamber</h3>
+    <div class="tblwrap"><table>
+      <thead><tr><th style="width:48px">Sl.</th><th>Description of item</th><th class="r">Quantity</th>
+        <th>Unit</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead>
+      <tbody>${b.rows.map(g=>g.h
+        ? `<tr class="sect"><td>${g.h}</td><td colspan="5">${esc(g.d)}</td></tr>`
+        : `<tr><td>${g.s}</td><td>${esc(g.d)}</td><td class="r">${n(g.q,2)}</td>
+           <td>${g.u}</td><td class="r">${inr(g.r)}</td><td class="r">${inr(g.a)}</td></tr>`).join("")}</tbody>
+      <tfoot>
+        <tr><td colspan="5">Total</td><td class="r">${inr(b.sub)}</td></tr>
+        <tr><td colspan="5">Total number of RWH pits proposed</td><td class="r">${S.zones.length} Nos</td></tr>
+        <tr><td colspan="5">IGST at 18%</td><td class="r">${inr(b.gst)}</td></tr>
+        <tr><td colspan="5">Grand total</td><td class="r">${inr(b.tot)}</td></tr>
+      </tfoot>
+    </table></div>
+  </div>
+
+  <div class="check no" style="margin-top:16px"><span class="mark">!</span><span class="txt">
+    <strong>Total row corrected against the template</strong>
+    <span>In the source workbook F52 reads SUM(F41:F51), which covers only section 6. Sections 1 to 5 — borewells, earthwork, modules, geotextile and filters — never reach the Grand Total. Here the Total sums every priced line.</span></span></div>
+
+  <div class="panel"><h3>Outputs</h3><div class="body">
+    <ul class="outlist">
+      <li><span class="ext">XLSX</span><span>Fresh BOQ workbook<span class="sub"> — RWH-1 to RWH-${S.zones.length}, Total Calculation, Desilting, Filter Chamber, Summary and the bill, in the template layout</span></span></li>
+      <li><span class="ext">XLSX</span><span>RWH calculation sheet<span class="sub"> — zone areas, coefficients and rainfall as sent to the client</span></span></li>
+      <li><span class="ext">DWG</span><span>Tank plans and sections<span class="sub"> — ${S.zones.length} sheets with module grid and levels</span></span></li>
+      <li><span class="ext">DWG</span><span>Updated site layout<span class="sub"> — tank blocks written, placement by the engineer</span></span></li>
+      <li><span class="ext">PDF</span><span>Technical proposal<span class="sub"> — data sheets, methodology, compliance note</span></span></li>
+    </ul>
+    <div class="actions" style="margin-top:6px">
+      <button class="btn" onclick="exportBOQ()">Download BOQ workbook</button>
+      <button class="btn ghost" onclick="reset()">Start another project</button>
+    </div>
+    <p class="note" style="margin-top:10px">Downloads a live .xlsx with every sheet above — calculation sheet, one tab per tank, total calculation, chambers, summary and the bill.</p>
+  </div></div>`;
+}
+
+/* ================= XLSX EXPORT ================= */
+function exportBOQ(){
+  if(typeof XLSX==="undefined"){ alert("Spreadsheet library still loading — try again in a moment."); return; }
+  const wb=XLSX.utils.book_new(), T=allCalc(), s=summary(), b=boq();
+  const add=(rows,name)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),name.slice(0,31));
+
+  /* --- RWH calculation sheet, Bareilly layout --- */
+  const cs=[[`RWH CALCULATION SHEET — ${S.project.name}`],[`${S.project.client}, ${S.project.city}`],[]];
+  S.zones.forEach(z=>{
+    const p=potential(z);
+    cs.push([`CALCULATION FOR ${z.name}`]);
+    cs.push(["Sr.no.","PARTICULAR","UOM","Area (sqm)","Co-efficient","Rainfall m/day","Total(cum)"]);
+    cs.push([1,"Rooftop Area","Sqm",z.roof,COEF.roof,rainM(),p.r]);
+    cs.push([2,"Paved Area","Sqm",z.paved,COEF.paved,rainM(),p.p]);
+    cs.push([3,"Green","Sqm",z.green,COEF.green,rainM(),p.g]);
+    cs.push(["","Total","Sqm",p.area,"","",p.total]);
+    cs.push([]);
+  });
+  cs.push(["","Tank","Length (m)","Width (m)","Height (m)","Volume (cum)","Modules L","Modules W","Boxes"]);
+  S.zones.forEach(z=>{const t=tankOf(z);cs.push(["",z.name,t.L,t.W,t.H,t.V,z.nl,z.nw,t.boxes]);});
+  cs.push(["","Total","","","",S.zones.reduce((a,z)=>a+tankOf(z).V,0)]);
+  add(cs,"RWH CALCULATION");
+
+  /* --- one sheet per tank --- */
+  T.forEach((t,i)=>{
+    add([
+      [`${t.name} CALCULATIONS`],[],
+      ["Length (m)",t.L],["Width (m)",t.W],["Height (m)",t.H],["Volume (cum)",t.vol],[],
+      ["Item","Unit","Quantity","Formula"],
+      ["Supply of Rainmaxx Smart","Cum",t.vol,"L × W × H"],
+      ["Installation of Rainmaxx Smart","Cum",t.vol,"= volume"],
+      ["Supply of Geotextile","Sqm",t.geo,"(2LW+2WH+2HL) × 1.3"],
+      ["Geotextile for base","Sqm",t.geoBase,"(L+1)(W+1) × 1.1"],
+      ["Micro filter","Nos",t.micro,""],
+      ["Horizontal filter","Nos",t.horiz,""],
+      ["Bore well","Nos",t.bores,"user input"],
+      ["Depth of borewell","m",t.boreTot,"bores × depth"],
+      ["Depth of pipe","m",t.pipeTot,""],
+      ["160 mm dia screen","m",t.slot,"60% of bore length"],
+      ["160 mm dia pipe","m",t.plain,"40% of bore length"],
+      ["Gravel in borewell","cft",t.gravel,"(πr²b − πr²p) × depth × 35.314 × bores"],
+      ["Excavation & disposal","Cum",t.exc,"mean of (L+2)(W+2)D and (L+1)(W+1)D"],
+      ["Aggregate 40mm for base","Cum",t.agg,"(L+1)(W+1) × 0.1"],
+      ["Sand for base + tank top","Cum",t.sand,"(L+1)(W+1)×0.1 + LW×0.2"],
+      ["Backfilling","Cum",t.back,"excavation − volume − sand − aggregate"],
+      ["Invert level","m",t.invert,"user input"],
+      ["Total depth","m",t.D,`invert + 0.20 + ${COVER} + H + 0.20`],
+      ["Surface dressing","Sqm",t.dress,"(L+1)(W+1)"],
+      ["FRP inspection","Nos",t.ports,"⌈total depth ÷ 1.5⌉"]
+    ], `${t.name} CALCULATIONS`);
+  });
+
+  /* --- Total Calculation --- */
+  const cols=[["Length\n(m)","L"],["Width\n(m)","W"],["Height (m)","H"],
+    ["Supply of Rainmaxx Smart Volume (cum)","vol"],["Installation of Rainmaxx Smart (cum)","vol"],
+    ["Supply of Geotextile (sqmt)","geo"],["Supply of Geotextile for base(sqmt)","geoBase"],
+    ["Micro filter","micro"],["Horizontal filter","horiz"],["Bore well (no.)","bores"],
+    ["Depth of Borewell","boreTot"],["Depth of Pipe","pipeTot"],
+    ["160 mm dia pipe Screen (Meter)","slot"],["160 mm dia pipe (Meter)","plain"],
+    ["Gravel in borewell (cft)","gravel"],["Excavation & Disposal (cum)","exc"],
+    ["Aggregate 40mm for Base (cum)","agg"],["Sand for Base + Tank SIDES (cum)","sand"],
+    ["Compaction of base","one"],["Backfilling (cum)","back"],["Invert level (meter)","invert"],
+    ["Total depth","D"],["Surface dressing","dress"],["FRP Inspection","ports"]];
+  const tc=[["BOQ"],["Pit No.",...cols.map(c=>c[0])]];
+  T.forEach((t,i)=>tc.push([`Pit ${i+1}`,...cols.map(c=>c[1]==="one"?1:t[c[1]])]));
+  tc.push(["Total",...cols.map(c=>
+    ["L","W","H","invert","D"].includes(c[1])?"":
+    (c[1]==="one"?T.length:T.reduce((a,t)=>a+t[c[1]],0)))]);
+  add(tc,"Total Calculation");
+
+  /* --- chambers --- */
+  const ch=(c,nm,rcc)=>{const q=chamber(c,rcc);return [
+    [nm],[],["Effective length (m)",c.L],["Effective width (m)",c.W],["Depth (m)",c.D],
+    ["Wall thickness (m)",c.wall],["PCC thickness (m)",c.pcc],...(rcc?[["RCC slab (m)",c.slab]]:[]),[],
+    ["Item","Unit","Quantity"],
+    ["Excavation","Cum",q.exc],["PCC","Cum",q.pcc],["Brick work","Cum",q.brick],
+    ["Plaster","Sqm",q.plaster],["RCC","Cum",q.rcc],["Steel","kg",q.steel],["Shuttering","Sqm",q.shut]];};
+  add(ch(S.dc,"DESILTING CHAMBER",true),"Desilting");
+  add(ch(S.fc,"FILTER CHAMBER",false),"Filter Chamber");
+
+  add([["SUMMARY OF ITEM"],["SN","DISCREPTION OF ITEM","DISELTIMG-1","FILTER CH.-1","UNIT","TOTAL"],
+    ...s.map((r,i)=>[i+1,r.n,r.d,r.f||"",r.u,r.t])],"SUMMARY");
+
+  /* --- BOQ, template layout --- */
+  const bq=[["BILL OF QUANTITY - RECHARGE TANK WITH BRICK MASONRY DESILTING CHAMBER"],[],
+    ["Sl. No","Description of Item","Quantity","Unit","Rate","Amount"]];
+  b.rows.forEach(g=>bq.push(g.h?[g.h,g.d]:[g.s,g.d,g.q,g.u,g.r,g.a]));
+  bq.push(["","Total","","","",b.sub]);
+  bq.push(["","Total no. of RWH pit proposed","Nos",S.zones.length]);
+  bq.push(["","IGST @ 18 % Applicable","","","",b.gst]);
+  bq.push(["","Grand Total","","","",b.tot]);
+  bq.push([]);
+  bq.push(["Note: Total sums every priced section. The source template summed section 6 only."]);
+  bq.push([`Rate schedule: ${S.region}. Rates indicative.`]);
+  add(bq,"RECHARGE WITH BRICKWORK");
+
+  const safe=(S.project.name||"project").replace(/[^A-Za-z0-9]+/g,"_").slice(0,40);
+  XLSX.writeFile(wb,`FRESH_BOQ_${safe}.xlsx`);
+}
+
+/* ================= EVENTS ================= */
+function set(path,val){const p=path.split(".");let o=S;while(p.length>1)o=o[p.shift()];o[p[0]]=val;
+  const k=document.activeElement&&document.activeElement.id;render(k);}
+function ez(id,k,v){
+  const z=S.zones.find(x=>x.id===id); if(!z) return;
+  if(k==="fixL"){ z.nl=Math.max(1,Math.round(v/PL)); }
+  else if(k==="fixW"){ z.nw=Math.max(1,Math.round(v/PW)); }
+  else z[k]=v;
+  if(["roof","paved","green"].includes(k)) S.approved=false;
+  render();
+}
+function autoGrid(id){
+  const z=S.zones.find(x=>x.id===id); if(!z) return;
+  const g=solveGrid(potential(z).total, z.layers); z.nl=g.nl; z.nw=g.nw; render();
+}
+function setC(which,k,v){ S[which][k]=v; render(); }
+function setTanks(v){
+  v=Math.max(1,Math.min(12,v||1)); S.nTanks=v; S.approved=false;
+  const base=[[5755,15395,1035],[15958,8424,5112],[13083,13569,4445]];
+  const out=[];
+  for(let i=0;i<v;i++){
+    const ex=S.zones[i];
+    const b=base[i%3], sc=1-(Math.floor(i/3)*0.18);
+    out.push(ex||{id:i+1,name:`RWH-${i+1}`,roof:Math.round(b[0]*sc),paved:Math.round(b[1]*sc),
+      green:Math.round(b[2]*sc),layers:4,nl:20,nw:9,bores:3,bdepth:30,invert:1.0});
+  }
+  S.zones=out.slice(0,v);
+  S.zones.forEach(z=>{ if(!z.nl||z.nl===20){const g=solveGrid(potential(z).total,z.layers);z.nl=g.nl;z.nw=g.nw;} });
+  render("nt");
+}
+function upload(){ S.uploaded=!S.uploaded; render(); }
+function approve(){ S.approved=true; S.zones.forEach(z=>{const g=solveGrid(potential(z).total,z.layers);z.nl=g.nl;z.nw=g.nw;}); go(2); }
+function reset(){ S.step=0; S.seen=0; S.approved=false; render(); }
+function go(i){ if(i>S.seen+1) return; S.step=i; S.seen=Math.max(S.seen,i); render(); window.scrollTo({top:0,behavior:"instant"}); }
+function render(focusId){
+  S.seen=Math.max(S.seen,S.step); drawRail();
+  $("#stage").innerHTML=[stage0,stage1,stage2,stage3,stage4,stage5,stage6][S.step]();
+  if(focusId){const el=document.getElementById(focusId);
+    if(el){el.focus();if(el.setSelectionRange&&el.type!=="number"){const v=el.value;el.setSelectionRange(v.length,v.length);}}}
+}
+render();
+</script>
+</body>
+</html>
