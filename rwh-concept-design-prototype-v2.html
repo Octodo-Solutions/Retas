@@ -125,6 +125,67 @@ tfoot td{border-top:1px solid var(--rule);font-weight:600;background:var(--sheet
 .tag.paved{background:var(--sand-soft);color:var(--sand)}
 .tag.green{background:var(--pass-soft);color:var(--pass)}
 .draw svg{display:block;width:100%;height:auto;max-width:300px;margin:0 auto}
+
+/* ---------- CAD viewer ---------- */
+.cad{display:grid;grid-template-columns:minmax(0,1fr) 262px;border:1px solid var(--rule);border-radius:3px;overflow:hidden;background:#fff}
+.cadview{position:relative;background:var(--paper);height:430px;overflow:hidden}
+.cadview canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+.cadview canvas.drag{cursor:grabbing}
+.cadtools{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.cadtools button{border:1px solid var(--rule);background:rgba(251,252,251,.94);color:var(--ink2);
+  border-radius:2px;padding:4px 9px;font-size:11.5px;cursor:pointer;font-family:"IBM Plex Mono",monospace}
+.cadtools button:hover{color:var(--ink);border-color:var(--ink3)}
+.cadstat{position:absolute;right:10px;bottom:10px;background:rgba(251,252,251,.94);border:1px solid var(--rule);
+  border-radius:2px;padding:3px 8px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink2)}
+.cadbusy{position:absolute;inset:0;display:grid;place-items:center;background:rgba(239,242,240,.96);gap:10px}
+.cadbusy .bar{width:200px;height:3px;background:var(--rule);border-radius:2px;overflow:hidden}
+.cadbusy .bar i{display:block;height:100%;background:var(--water);width:0}
+.cadbusy p{font-size:12.5px;color:var(--ink2);font-family:"IBM Plex Mono",monospace}
+.cadlayers{border-left:1px solid var(--rule);background:var(--sheet);display:flex;flex-direction:column;max-height:430px}
+.cadlayers h4{font-size:11.5px;font-weight:600;color:var(--ink2);padding:10px 12px;border-bottom:1px solid var(--rule2);flex:none}
+.cadlayers .scrollers{overflow-y:auto;flex:1}
+.lrow{display:grid;grid-template-columns:16px minmax(0,1fr);gap:7px;padding:6px 12px;border-bottom:1px solid var(--rule2);align-items:start}
+.lrow:hover{background:var(--band)}
+.lrow .eye{width:12px;height:12px;border-radius:2px;border:1px solid var(--rule);background:#fff;cursor:pointer;margin-top:3px;padding:0}
+.lrow .eye[data-on="1"]{background:var(--ink2);border-color:var(--ink2)}
+.lrow .nm{font-size:12px;line-height:1.3;word-break:break-word}
+.lrow .meta{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink3);margin-top:1px}
+.lrow select{width:100%;margin-top:4px;font-size:11px;padding:2px 4px;border:1px solid var(--rule);border-radius:2px;background:#fff}
+.lrow.tag-roof{background:var(--water-soft)}
+.lrow.tag-paved{background:var(--sand-soft)}
+.lrow.tag-green{background:var(--pass-soft)}
+.cadfoot{border-top:1px solid var(--rule2);padding:10px 12px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink2);flex:none}
+.cadfoot div{display:flex;justify-content:space-between;padding:1px 0}
+@media (max-width:820px){.cad{grid-template-columns:minmax(0,1fr)}.cadlayers{border-left:0;border-top:1px solid var(--rule);max-height:260px}}
+
+/* ---------- zone review ---------- */
+.zonewrap{display:grid;grid-template-columns:minmax(0,1fr) 250px}
+.zonemap{height:340px;background:var(--paper);border-right:1px solid var(--rule2)}
+.zonemap canvas{display:block;width:100%;height:100%}
+.zonekey{padding:12px;overflow-y:auto;max-height:340px}
+.zk{display:grid;grid-template-columns:12px minmax(0,1fr);gap:9px;padding:7px 0;border-bottom:1px solid var(--rule2)}
+.zk:last-child{border-bottom:0}
+.zk{cursor:pointer;border-radius:2px;padding-left:5px;margin-left:-5px}
+.zk:hover{background:var(--band)}
+.zk.on{background:var(--band)}
+.zk.off{opacity:.45}
+.badge{font-family:"IBM Plex Mono",monospace;font-size:9.5px;background:var(--sand-soft);
+  color:var(--sand);border-radius:2px;padding:1px 4px;vertical-align:1px}
+.zk .sw{width:12px;height:12px;border-radius:2px;margin-top:3px}
+.zk b{font-size:12.5px;font-weight:600}
+.zk .meta{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink3);line-height:1.45}
+.promptbar{display:flex;gap:8px}
+.promptbar input{flex:1;border:1px solid var(--rule);border-radius:2px;background:#fff;padding:9px 11px;font-size:14px}
+.promptbar input:focus{border-color:var(--water)}
+.plog{margin-top:14px;border-top:1px solid var(--rule2);padding-top:10px}
+.pl{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding:6px 0;border-bottom:1px solid var(--rule2)}
+.pl:last-child{border-bottom:0}
+.pl .q{font-size:12.5px;color:var(--ink2)}
+.pl .q::before{content:"› ";color:var(--ink3)}
+.pl .a{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--water)}
+.pl.bad .a{color:var(--fail)}
+@media (max-width:820px){.zonewrap{grid-template-columns:minmax(0,1fr)}
+  .zonemap{border-right:0;border-bottom:1px solid var(--rule2)}.zonekey{max-height:none}}
 .legend{font-size:11.5px;color:var(--ink3);padding:0 16px 14px}
 .outlist{list-style:none}
 .outlist li{display:flex;gap:11px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--rule2);font-size:13.5px}
@@ -357,6 +418,554 @@ function section(t){
 </svg>`;
 }
 
+/* ================= DXF PARSER + VIEWER ================= */
+const CAD={loaded:false,parsing:false,pct:0,name:"",size:0,layers:[],lidx:{},ents:[],
+  bbox:null,upm:1000,texts:0,note:""};
+const VIEW={sc:1,ox:0,oy:0,drag:false,px:0,py:0,mx:null,my:null};
+let CV=null,CTX=null;
+
+function parseDXF(text,done){
+  CAD.parsing=true; CAD.pct=0;
+  let i=0; const len=text.length;
+  let sect=null,tbl=null,pend=null,ent=null,lay=null,closed=false;
+  let xs=[],ys=[],cx=0,cy=0,rr=0,a0=0,a1=0;
+  const layers=[],lidx={},ents=[];
+  let bx0=1e30,by0=1e30,bx1=-1e30,by1=-1e30,texts=0;
+  let hkey=null, ext={};
+
+  const L=nm=>{ if(!(nm in lidx)){lidx[nm]=layers.length;layers.push({name:nm,n:0,cn:0,area:0,vis:true,tag:""});}
+    return lidx[nm]; };
+  function bump(x,y){ if(x<bx0)bx0=x; if(x>bx1)bx1=x; if(y<by0)by0=y; if(y>by1)by1=y; }
+
+  function flush(){
+    if(!ent){return;}
+    const li=lay?L(lay):null;
+    if(li!==null){
+      if(ent==="LWPOLYLINE"||ent==="POLYLINE"){
+        const m=Math.min(xs.length,ys.length);
+        if(m>=2){
+          const p=new Float64Array(m*2);
+          for(let k=0;k<m;k++){p[k*2]=xs[k];p[k*2+1]=ys[k];bump(xs[k],ys[k]);}
+          ents.push({l:li,t:closed?"P":"O",p});
+          layers[li].n++;
+          if(closed&&m>=3){
+            let a=0;
+            for(let k=0;k<m;k++){const j=(k+1)%m;a+=xs[k]*ys[j]-xs[j]*ys[k];}
+            layers[li].area+=Math.abs(a)/2; layers[li].cn++;
+          }
+        }
+      } else if(ent==="LINE"){
+        if(xs.length>=2&&ys.length>=2){
+          ents.push({l:li,t:"O",p:new Float64Array([xs[0],ys[0],xs[1],ys[1]])});
+          bump(xs[0],ys[0]); bump(xs[1],ys[1]); layers[li].n++;
+        }
+      } else if(ent==="CIRCLE"){
+        if(rr>0){ents.push({l:li,t:"C",c:[cx,cy,rr]});bump(cx-rr,cy-rr);bump(cx+rr,cy+rr);
+          layers[li].n++;layers[li].area+=Math.PI*rr*rr;layers[li].cn++;}
+      } else if(ent==="ARC"){
+        if(rr>0){ents.push({l:li,t:"A",c:[cx,cy,rr,a0,a1]});bump(cx-rr,cy-rr);bump(cx+rr,cy+rr);layers[li].n++;}
+      } else if(ent==="TEXT"||ent==="MTEXT"){ texts++; }
+    }
+    ent=null;lay=null;closed=false;xs=[];ys=[];cx=cy=rr=0;a0=0;a1=360;
+  }
+
+  function nextLine(){
+    if(i>=len)return null;
+    let j=text.indexOf("\n",i);
+    if(j<0)j=len;
+    let s=text.substring(i,j); i=j+1;
+    if(s.charCodeAt(s.length-1)===13)s=s.slice(0,-1);
+    return s;
+  }
+
+  function step(){
+    const stop=performance.now()+28;
+    while(performance.now()<stop){
+      for(let b=0;b<9000;b++){
+        const c=nextLine(); if(c===null){finish();return;}
+        const v=nextLine(); if(v===null){finish();return;}
+        const code=c.trim();
+        if(sect==="HEADER"){
+          if(code==="9")hkey=v.trim();
+          else if(hkey==="$EXTMIN"||hkey==="$EXTMAX"){
+            if(code==="10"||code==="20"){const f=parseFloat(v);
+              if(f===f)ext[hkey+code]=f;}
+          }
+        }
+        if(code==="0"){
+          flush();
+          const val=v.trim();
+          if(val==="SECTION")sect="?";
+          else if(val==="ENDSEC"){sect=null;tbl=null;}
+          else if(val==="TABLE")pend="T";
+          else if(val==="ENDTAB")tbl=null;
+          else if(sect==="TABLES"&&val==="LAYER"&&tbl==="LAYER")pend="L";
+          else if(sect==="ENTITIES")ent=val;
+        } else if(code==="2"){
+          const val=v.trim();
+          if(sect==="?")sect=val;
+          else if(pend==="T"){tbl=val;pend=null;}
+          else if(pend==="L"){L(val);pend=null;}
+        } else if(sect==="ENTITIES"&&ent){
+          if(code==="8")lay=v.trim();
+          else if(code==="70"&&(ent==="LWPOLYLINE"||ent==="POLYLINE")){closed=!!(parseInt(v,10)&1);}
+          else if(code==="10"){const f=parseFloat(v);if(f===f){if(ent==="CIRCLE"||ent==="ARC")cx=f;else xs.push(f);}}
+          else if(code==="20"){const f=parseFloat(v);if(f===f){if(ent==="CIRCLE"||ent==="ARC")cy=f;else ys.push(f);}}
+          else if(code==="11"&&ent==="LINE"){const f=parseFloat(v);if(f===f)xs.push(f);}
+          else if(code==="21"&&ent==="LINE"){const f=parseFloat(v);if(f===f)ys.push(f);}
+          else if(code==="40"&&(ent==="CIRCLE"||ent==="ARC")){const f=parseFloat(v);if(f===f)rr=f;}
+          else if(code==="50"&&ent==="ARC"){const f=parseFloat(v);if(f===f)a0=f;}
+          else if(code==="51"&&ent==="ARC"){const f=parseFloat(v);if(f===f)a1=f;}
+        }
+      }
+    }
+    CAD.pct=i/len; paintBusy();
+    requestAnimationFrame(step);
+  }
+
+  function finish(){
+    flush();
+    CAD.layers=layers; CAD.lidx=lidx; CAD.ents=ents; CAD.texts=texts;
+    let bb=(bx1>bx0)?[bx0,by0,bx1,by1]:null;
+    const hx0=ext["$EXTMIN10"],hy0=ext["$EXTMIN20"],hx1=ext["$EXTMAX10"],hy1=ext["$EXTMAX20"];
+    if(hx1>hx0&&hy1>hy0){
+      // header extents beat computed ones: stray off-sheet entities skew the latter
+      if(!bb||((hx1-hx0)*(hy1-hy0) < (bb[2]-bb[0])*(bb[3]-bb[1]))) bb=[hx0,hy0,hx1,hy1];
+    }
+    CAD.bbox=bb;
+    const w=CAD.bbox?(CAD.bbox[2]-CAD.bbox[0]):0;
+    CAD.upm=w>20000?1000:1;
+    CAD.note=w>20000?"units read as millimetres":"units read as metres";
+    CAD.parsing=false; CAD.loaded=true;
+    autoTag(); done&&done();
+  }
+  step();
+}
+
+/* guess surface type from layer name */
+function autoTag(){
+  const R=/roof|terrace|slab|plot|villa|building|blk|block|tower|hut|podium/i;
+  const P=/road|pav|drive|park|paths|kerb|curb|court|plaza|hard/i;
+  const G=/green|lawn|land ?scape|garden|soft|tree|park$/i;
+  CAD.layers.forEach(l=>{
+    if(l.cn===0){l.tag="";return;}
+    if(/title|frame|border|defpoint|grid|viewport/i.test(l.name)){l.tag="";return;}
+    if(G.test(l.name))l.tag="green";
+    else if(P.test(l.name))l.tag="paved";
+    else if(R.test(l.name))l.tag="roof";
+    else l.tag="";
+  });
+}
+const layerArea=tag=>CAD.layers.filter(l=>l.tag===tag)
+  .reduce((a,l)=>a+l.area,0)/(CAD.upm*CAD.upm);
+
+/* ---------- canvas ---------- */
+function cvSize(){
+  if(!CV)return[0,0];
+  const dpr=window.devicePixelRatio||1, r=CV.getBoundingClientRect();
+  if(CV.width!==Math.round(r.width*dpr)||CV.height!==Math.round(r.height*dpr)){
+    CV.width=Math.round(r.width*dpr); CV.height=Math.round(r.height*dpr);
+  }
+  return[r.width,r.height];
+}
+function zoomExtents(){
+  const[w,h]=cvSize(); if(!CAD.bbox||!w)return;
+  const[x0,y0,x1,y1]=CAD.bbox;
+  const s=Math.min(w/Math.max(x1-x0,1e-6),h/Math.max(y1-y0,1e-6))*0.88;
+  VIEW.sc=s; VIEW.ox=(x0+x1)/2-w/(2*s); VIEW.oy=(y0+y1)/2-h/(2*s);
+  drawCAD();
+}
+function zoomTag(tag){
+  const ls=CAD.layers.map((l,i)=>[l,i]).filter(([l])=>l.tag===tag).map(([,i])=>i);
+  if(!ls.length)return;
+  let x0=1e30,y0=1e30,x1=-1e30,y1=-1e30;
+  for(const e of CAD.ents){ if(!ls.includes(e.l))continue;
+    if(e.p){for(let k=0;k<e.p.length;k+=2){x0=Math.min(x0,e.p[k]);x1=Math.max(x1,e.p[k]);
+      y0=Math.min(y0,e.p[k+1]);y1=Math.max(y1,e.p[k+1]);}}
+    else if(e.c){x0=Math.min(x0,e.c[0]-e.c[2]);x1=Math.max(x1,e.c[0]+e.c[2]);
+      y0=Math.min(y0,e.c[1]-e.c[2]);y1=Math.max(y1,e.c[1]+e.c[2]);}}
+  if(x1<=x0)return;
+  const[w,h]=cvSize();
+  const s=Math.min(w/(x1-x0),h/(y1-y0))*0.8;
+  VIEW.sc=s; VIEW.ox=(x0+x1)/2-w/(2*s); VIEW.oy=(y0+y1)/2-h/(2*s);
+  drawCAD();
+}
+const STYLE={roof:["#0C6B70",1.1],paved:["#A8762E",1.1],green:["#2F6B45",1.1],"":["#98A6A0",.7]};
+function drawCAD(){
+  if(!CV)return;
+  const[w,h]=cvSize(); if(!w)return;
+  const dpr=window.devicePixelRatio||1;
+  CTX.setTransform(dpr,0,0,dpr,0,0);
+  CTX.clearRect(0,0,w,h);
+  CTX.fillStyle="#EFF2F0"; CTX.fillRect(0,0,w,h);
+  if(!CAD.loaded)return;
+  const sc=VIEW.sc,ox=VIEW.ox,oy=VIEW.oy;
+  const SX=x=>(x-ox)*sc, SY=y=>h-(y-oy)*sc;
+  for(const tag of ["","green","paved","roof"]){
+    const[col,lw]=STYLE[tag];
+    CTX.strokeStyle=col; CTX.lineWidth=lw; CTX.globalAlpha=tag?0.95:0.5;
+    CTX.beginPath();
+    for(const e of CAD.ents){
+      const L=CAD.layers[e.l];
+      if(!L||!L.vis||(L.tag||"")!==tag)continue;
+      if(e.p){
+        const p=e.p,n=p.length;
+        CTX.moveTo(SX(p[0]),SY(p[1]));
+        for(let k=2;k<n;k+=2)CTX.lineTo(SX(p[k]),SY(p[k+1]));
+        if(e.t==="P")CTX.closePath();
+      } else if(e.t==="C"){
+        const r=e.c[2]*sc; if(r<0.4)continue;
+        CTX.moveTo(SX(e.c[0])+r,SY(e.c[1]));
+        CTX.arc(SX(e.c[0]),SY(e.c[1]),r,0,Math.PI*2);
+      } else if(e.t==="A"){
+        const r=e.c[2]*sc; if(r<0.4)continue;
+        CTX.arc(SX(e.c[0]),SY(e.c[1]),r,-e.c[4]*Math.PI/180,-e.c[3]*Math.PI/180);
+      }
+    }
+    CTX.stroke();
+  }
+  CTX.globalAlpha=1;
+  const st=document.getElementById("cadstat");
+  if(st){
+    const m=CAD.upm;
+    st.textContent=(VIEW.mx===null?"":`x ${(VIEW.mx/m).toFixed(1)}  y ${(VIEW.my/m).toFixed(1)} m   `)
+      +`1:${Math.round(m/VIEW.sc/1)}`;
+  }
+}
+function paintBusy(){
+  const b=document.getElementById("cadbar");
+  if(b)b.style.width=Math.round(CAD.pct*100)+"%";
+}
+function bindCAD(){
+  CV=document.getElementById("cadcv"); if(!CV)return;
+  CTX=CV.getContext("2d");
+  CV.onwheel=e=>{e.preventDefault();
+    const r=CV.getBoundingClientRect(),h=r.height;
+    const sx=e.clientX-r.left, sy=e.clientY-r.top;
+    const wx=sx/VIEW.sc+VIEW.ox, wy=(h-sy)/VIEW.sc+VIEW.oy;
+    VIEW.sc*=e.deltaY<0?1.18:1/1.18;
+    VIEW.ox=wx-sx/VIEW.sc; VIEW.oy=wy-(h-sy)/VIEW.sc; drawCAD();};
+  CV.onpointerdown=e=>{VIEW.drag=true;VIEW.px=e.clientX;VIEW.py=e.clientY;
+    CV.classList.add("drag");CV.setPointerCapture(e.pointerId);};
+  CV.onpointermove=e=>{
+    const r=CV.getBoundingClientRect();
+    VIEW.mx=(e.clientX-r.left)/VIEW.sc+VIEW.ox;
+    VIEW.my=(r.height-(e.clientY-r.top))/VIEW.sc+VIEW.oy;
+    if(VIEW.drag){VIEW.ox-=(e.clientX-VIEW.px)/VIEW.sc;VIEW.oy+=(e.clientY-VIEW.py)/VIEW.sc;
+      VIEW.px=e.clientX;VIEW.py=e.clientY;}
+    drawCAD();};
+  CV.onpointerup=CV.onpointercancel=()=>{VIEW.drag=false;CV.classList.remove("drag");};
+  if(CAD.loaded&&!VIEW.sc)zoomExtents(); else drawCAD();
+}
+function onFile(ev){
+  const f=(ev.target.files||ev.dataTransfer.files)[0]; if(!f)return;
+  CAD.name=f.name; CAD.size=f.size; CAD.loaded=false; CAD.parsing=true; CAD.pct=0;
+  S.uploaded=true; S.approved=false; render();
+  const rd=new FileReader();
+  rd.onload=()=>parseDXF(rd.result,()=>{render();setTimeout(()=>{zoomExtents();},30);});
+  rd.readAsText(f);
+}
+function tagLayer(i,v){CAD.layers[i].tag=v;render();}
+function eyeLayer(i){CAD.layers[i].vis=!CAD.layers[i].vis;render();}
+function clearCAD(){CAD.loaded=false;CAD.parsing=false;CAD.ents=[];CAD.layers=[];
+  CAD.bbox=null;S.uploaded=false;VIEW.sc=0;render();}
+
+/* ================= ZONE EXTRACTION ================= */
+const ZC=["#0C6B70","#A8762E","#2F6B45","#4A5E8C","#8C4A52","#6B6B2F","#6B4A7A","#8C5A2E",
+          "#2E6B8C","#7A5A2E","#3E7A5E","#7A3E5E"];
+S.log=[]; S.prov=[]; S.sel=null;
+
+/* centroid + area of every closed polygon on a tagged layer */
+function catchPolys(){
+  const out=[], u2=CAD.upm*CAD.upm;
+  for(const e of CAD.ents){
+    const L=CAD.layers[e.l];
+    if(!L||!L.vis||!L.tag||e.t!=="P"||!e.p)continue;
+    const p=e.p,m=p.length/2; if(m<3)continue;
+    let a=0,cx=0,cy=0;
+    for(let k=0;k<m;k++){
+      const j=(k+1)%m, x1=p[k*2],y1=p[k*2+1],x2=p[j*2],y2=p[j*2+1];
+      const cr=x1*y2-x2*y1; a+=cr; cx+=(x1+x2)*cr; cy+=(y1+y2)*cr;
+    }
+    a/=2; if(Math.abs(a)<1e-6)continue;
+    out.push({x:cx/(6*a),y:cy/(6*a),area:Math.abs(a)/u2,tag:L.tag,lay:L.name,e});
+  }
+  return out;
+}
+
+/* k-means++ on centroids, weighted by area. Seeded for reproducibility. */
+function kmeans(pts,k){
+  if(pts.length===0||k<1)return[];
+  if(pts.length<=k)return pts.map((_,i)=>i);
+  let seed=20260925;
+  const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};
+  const C=[{x:pts[0].x,y:pts[0].y}];
+  while(C.length<k){
+    const d=pts.map(p=>Math.min(...C.map(c=>(p.x-c.x)**2+(p.y-c.y)**2))*p.area);
+    const tot=d.reduce((a,b)=>a+b,0); let r=rnd()*tot,i=0;
+    while(i<d.length-1&&r>d[i]){r-=d[i];i++;}
+    C.push({x:pts[i].x,y:pts[i].y});
+  }
+  let asg=new Array(pts.length).fill(0);
+  for(let it=0;it<60;it++){
+    let moved=false;
+    pts.forEach((p,i)=>{
+      let bi=0,bd=Infinity;
+      C.forEach((c,j)=>{const d=(p.x-c.x)**2+(p.y-c.y)**2; if(d<bd){bd=d;bi=j;}});
+      if(asg[i]!==bi){asg[i]=bi;moved=true;}
+    });
+    C.forEach((c,j)=>{
+      let sx=0,sy=0,sw=0;
+      pts.forEach((p,i)=>{if(asg[i]===j){sx+=p.x*p.area;sy+=p.y*p.area;sw+=p.area;}});
+      if(sw>0){c.x=sx/sw;c.y=sy/sw;}
+    });
+    if(!moved)break;
+  }
+  return asg;
+}
+
+/* areas derive from polygon membership unless the zone was edited by number */
+function syncZone(i){
+  const p=S.prov[i],z=S.zones[i]; if(!p||!z)return;
+  if(!z.edited){
+    const A=t=>Math.round(p.pts.filter(m=>m.tag===t).reduce((a,m)=>a+m.area,0));
+    z.roof=A("roof"); z.paved=A("paved"); z.green=A("green");
+  }
+  const w=p.pts.reduce((a,m)=>a+m.area,0)||1e-9;
+  p.n=p.pts.length;
+  p.cx=p.pts.reduce((a,m)=>a+m.x*m.area,0)/w;
+  p.cy=p.pts.reduce((a,m)=>a+m.y*m.area,0)/w;
+  p.byLay={}; p.pts.forEach(m=>{p.byLay[m.lay]=(p.byLay[m.lay]||0)+m.area;});
+  const g=solveGrid(potential(z).total,z.layers); z.nl=g.nl; z.nw=g.nw;
+}
+function syncAll(){ S.zones.forEach((_,i)=>syncZone(i)); }
+
+/* cluster the drawing into S.nTanks zones, recording provenance */
+function buildZones(){
+  const pts=catchPolys(); S.sel=null;
+  if(!pts.length){ reseedFlat(); return; }
+  const k=Math.max(1,Math.min(S.nTanks,pts.length));
+  const asg=kmeans(pts,k);
+  const cen=g=>{const w=g.reduce((a,m)=>a+m.area,0)||1e-9;
+    return g.reduce((a,m)=>a+m.x*m.area,0)/w;};
+  const groups=Array.from({length:k},(_,j)=>pts.filter((_,i)=>asg[i]===j))
+    .filter(g=>g.length).sort((a,b)=>cen(a)-cen(b));
+  S.zones=groups.map((g,i)=>({id:i+1,name:`RWH-${i+1}`,roof:0,paved:0,green:0,
+    layers:4,nl:0,nw:0,bores:3,bdepth:30,invert:1.0,edited:false}));
+  S.prov=groups.map(g=>({pts:g,n:g.length,cx:0,cy:0,byLay:{}}));
+  syncAll();
+}
+function reseedFlat(){
+  const v=S.nTanks, R=layerArea("roof")/v, Pv=layerArea("paved")/v, G=layerArea("green")/v;
+  S.zones=Array.from({length:v},(_,i)=>({id:i+1,name:`RWH-${i+1}`,roof:Math.round(R),
+    paved:Math.round(Pv),green:Math.round(G),layers:4,nl:0,nw:0,bores:3,bdepth:30,invert:1.0}));
+  S.prov=[];
+  S.zones.forEach(z=>{const g=solveGrid(potential(z).total,z.layers);z.nl=g.nl;z.nw=g.nw;});
+}
+function narrate(){
+  if(!S.prov.length)return "";
+  const tot=S.prov.reduce((a,p)=>a+p.n,0);
+  const dom=S.zones.map((z,i)=>{
+    const L=Object.entries(S.prov[i].byLay).sort((a,b)=>b[1]-a[1])[0];
+    return L?L[0].trim():"—";});
+  const dup=[];
+  for(let i=0;i<S.zones.length;i++)for(let j=i+1;j<S.zones.length;j++){
+    const a=S.zones[i],b=S.zones[j];
+    if(S.prov[i].n===S.prov[j].n&&Math.abs(a.roof-b.roof)<=2&&Math.abs(a.green-b.green)<=2
+      &&Math.abs(a.paved-b.paved)<=2&&a.roof+a.green>0) dup.push(`${a.name} and ${b.name}`);
+  }
+  return `Grouped ${n(tot)} closed boundaries into ${S.zones.length} zone${S.zones.length>1?"s":""} `
+    +`by proximity, weighting each polygon by its area so large surfaces anchor the clusters. `
+    +`${S.zones.map((z,i)=>`${z.name} centres on ${dom[i]} with ${n(S.prov[i].n)} boundaries`).join("; ")}. `
+    +(dup.length?`${dup.join(", ")} came out with identical areas and boundary counts, which usually means `
+      +`the drawing holds two copies of the same layout — ask for it to be halved if so. `:"")
+    +`Drainage direction is not in the drawing, so the split is geometric — correct it below if the storm slopes say otherwise.`;
+}
+
+/* ================= PROMPT INTERPRETER ================= */
+function zref(s){
+  if(!s)return -1;
+  s=String(s).trim().toLowerCase();
+  const m=s.match(/(\d+)/);
+  if(m){const i=+m[1]-1; return (i>=0&&i<S.zones.length)?i:-1;}
+  const w={first:0,second:1,third:2,fourth:3,last:S.zones.length-1};
+  return (s in w)?w[s]:-1;
+}
+function renumber(){S.zones.forEach((z,i)=>{z.id=i+1;
+  if(!z.name||!z.name.trim()||/^RWH-\d+$/.test(z.name))z.name=`RWH-${i+1}`;});}
+function resolve(){S.zones.forEach(z=>{const g=solveGrid(potential(z).total,z.layers);z.nl=g.nl;z.nw=g.nw;});}
+
+function applyPrompt(txt){
+  const t=(txt||"").trim(); if(!t)return null;
+  const s=t.toLowerCase();
+  let m,msg=null;
+
+  const SP=S.prov.length>0;
+  if((m=s.match(/merge\s+(?:zone\s*|rwh-?\s*)?(\w+)\s*(?:and|with|\+|,|into)\s*(?:zone\s*|rwh-?\s*)?(\w+)/))){
+    const a=zref(m[1]),b=zref(m[2]);
+    if(a<0||b<0||a===b)return{ok:false,msg:"Couldn't identify both zones."};
+    const lo=Math.min(a,b),hi=Math.max(a,b),A=S.zones[lo],B=S.zones[hi];
+    A.roof+=B.roof;A.paved+=B.paved;A.green+=B.green;A.edited=A.edited||B.edited;
+    if(SP){S.prov[lo].pts=S.prov[lo].pts.concat(S.prov[hi].pts);S.prov.splice(hi,1);}
+    S.zones.splice(hi,1);
+    S.nTanks=S.zones.length;renumber();S.sel=lo;SP?syncAll():resolve();
+    msg=`Merged into ${A.name} — ${SP?n(S.prov[lo].n)+" boundaries, ":""}${S.zones.length} zones now.`;
+  }
+  else if((m=s.match(/(?:split|divide)\s+(?:zone\s*|rwh-?\s*)?(\w+)(?:\s+into\s+(\d+))?/))){
+    const a=zref(m[1]); if(a<0)return{ok:false,msg:"Couldn't identify that zone."};
+    const parts=Math.max(2,Math.min(4,+(m[2]||2)));
+    if(SP&&S.prov[a].pts.length>=parts){
+      const sub=S.prov[a].pts, asg=kmeans(sub,parts);
+      const cen=g=>{const w=g.reduce((x,y)=>x+y.area,0)||1e-9;
+        return g.reduce((x,y)=>x+y.x*y.area,0)/w;};
+      const gs=Array.from({length:parts},(_,j)=>sub.filter((_,i)=>asg[i]===j))
+        .filter(g=>g.length).sort((x,y)=>cen(x)-cen(y));
+      const base=S.zones[a];
+      S.zones.splice(a,1,...gs.map(()=>({...base,id:0,name:"",roof:0,paved:0,green:0,nl:0,nw:0,edited:false})));
+      S.prov.splice(a,1,...gs.map(g=>({pts:g,n:g.length,cx:0,cy:0,byLay:{}})));
+      S.nTanks=S.zones.length;renumber();S.sel=a;syncAll();
+      msg=`Split into ${gs.length} by proximity — ${gs.map(g=>g.length).join(" / ")} boundaries.`;
+    } else {
+      const A=S.zones[a];
+      S.zones.splice(a,1,...Array.from({length:parts},()=>({...A,id:0,name:"",
+        roof:Math.round(A.roof/parts),paved:Math.round(A.paved/parts),
+        green:Math.round(A.green/parts),nl:0,nw:0,edited:true})));
+      S.nTanks=S.zones.length;renumber();resolve();
+      msg=`Split into ${parts} by area. Now ${S.zones.length} zones.`;
+    }
+  }
+  else if((m=s.match(/(?:move|shift|give|assign|put)\s+(?:the\s+)?(roof\w*|paved?|green|landscape)\s*(?:area)?\s*(?:from\s*(?:zone\s*|rwh-?\s*)?(\w+))?\s*(?:to|into)\s*(?:zone\s*|rwh-?\s*)?(\w+)/))){
+    const f=/roof/.test(m[1])?"roof":/pav/.test(m[1])?"paved":"green";
+    const to=zref(m[3]); if(to<0)return{ok:false,msg:"Couldn't identify the target zone."};
+    const from=m[2]?zref(m[2]):-1;
+    if(SP){
+      let moved=0;
+      S.prov.forEach((p,i)=>{
+        if(i===to||(from>=0&&i!==from))return;
+        const keep=[],mv=[];
+        p.pts.forEach(x=>(x.tag===f?mv:keep).push(x));
+        p.pts=keep; S.prov[to].pts=S.prov[to].pts.concat(mv); moved+=mv.length;
+      });
+      S.zones.forEach(z=>z.edited=false); S.sel=to; syncAll();
+      msg=moved?`${n(moved)} ${f} boundaries moved into ${S.zones[to].name}.`
+               :`No ${f} boundaries found to move.`;
+    } else {
+      if(from>=0){S.zones[to][f]+=S.zones[from][f];S.zones[from][f]=0;}
+      else{let acc=0;S.zones.forEach((z,i)=>{if(i!==to){acc+=z[f];z[f]=0;}});S.zones[to][f]+=acc;}
+      S.zones[to].edited=true; resolve();
+      msg=`All ${f} area consolidated into ${S.zones[to].name}.`;
+    }
+  }
+  else if(/rebalance|equal|even(ly)?|same size/.test(s)){
+    const R=S.zones.reduce((a,z)=>a+z.roof,0),P=S.zones.reduce((a,z)=>a+z.paved,0),
+          G=S.zones.reduce((a,z)=>a+z.green,0),k=S.zones.length;
+    S.zones.forEach(z=>{z.roof=Math.round(R/k);z.paved=Math.round(P/k);
+      z.green=Math.round(G/k);z.edited=true;});
+    resolve(); msg=`Areas spread evenly across ${k} zones — set by number, so the map still shows the source boundaries.`;
+  }
+  else if(/halve|half|duplicat|double.?count|mirror/.test(s)){
+    S.zones.forEach(z=>{z.roof=Math.round(z.roof/2);z.paved=Math.round(z.paved/2);
+      z.green=Math.round(z.green/2);z.edited=true;});
+    resolve(); msg="All areas halved — use when the drawing holds two copies of the layout.";
+  }
+  else if((m=t.match(/rename\s+(?:zone\s*|rwh-?\s*)?(\w+)\s+(?:to|as)\s+(.+)$/i))){
+    const a=zref(m[1]); if(a<0)return{ok:false,msg:"Couldn't identify that zone."};
+    S.zones[a].name=m[2].trim().replace(/["']/g,"");
+    msg=`Renamed to ${S.zones[a].name}.`;
+  }
+  else if((m=s.match(/(?:set|make)\s+(?:zone\s*|rwh-?\s*)?(\w+)\s+(roof\w*|paved?|green)\s*(?:area)?\s*(?:to|=)\s*([\d,\.]+)/))){
+    const a=zref(m[1]); if(a<0)return{ok:false,msg:"Couldn't identify that zone."};
+    const f=/roof/.test(m[2])?"roof":/pav/.test(m[2])?"paved":"green";
+    S.zones[a][f]=Math.round(parseFloat(m[3].replace(/,/g,"")))||0;
+    S.zones[a].edited=true; S.sel=a; resolve();
+    msg=`${S.zones[a].name} ${f} set to ${n(S.zones[a][f])} sqm by hand.`;
+  }
+  else if((m=s.match(/(?:delete|remove|drop)\s+(?:zone\s*|rwh-?\s*)?(\w+)/))){
+    const a=zref(m[1]); if(a<0)return{ok:false,msg:"Couldn't identify that zone."};
+    if(S.zones.length<2)return{ok:false,msg:"At least one zone is needed."};
+    const nm=S.zones[a].name;
+    const orphan=SP?S.prov[a].pts:[];
+    S.zones.splice(a,1); if(SP)S.prov.splice(a,1);
+    orphan.forEach(x=>{
+      let bi=0,bd=Infinity;
+      S.prov.forEach((p,i)=>{const d=(x.x-p.cx)**2+(x.y-p.cy)**2; if(d<bd){bd=d;bi=i;}});
+      if(S.prov[bi])S.prov[bi].pts.push(x);
+    });
+    S.nTanks=S.zones.length;S.sel=null;renumber();SP?syncAll():resolve();
+    msg=`${nm} removed${orphan.length?`, its ${n(orphan.length)} boundaries reassigned to the nearest zones`:""}. Now ${S.zones.length} zones.`;
+  }
+  else if(/re-?(extract|cluster|run)|start over|reset/.test(s)){
+    buildZones(); msg=`Re-clustered into ${S.zones.length} zones.`;
+  }
+  else return {ok:false,msg:null};
+  S.approved=false;
+  return {ok:true,msg};
+}
+function runPrompt(){
+  const el=document.getElementById("zprompt"); if(!el)return;
+  const t=el.value; const r=applyPrompt(t);
+  if(!r){return;}
+  if(r.ok) S.log.unshift({t, m:r.msg, ok:true});
+  else S.log.unshift({t, m:r.msg||"Not understood. Try merge, split, move, rebalance, halve, rename, set or delete.", ok:false});
+  el.value=""; render();
+}
+
+/* ================= ZONE MAP ================= */
+let ZV=null,ZX=null;
+function drawZones(){
+  ZV=document.getElementById("zonecv"); if(!ZV||!CAD.loaded)return;
+  ZX=ZV.getContext("2d");
+  const dpr=window.devicePixelRatio||1, r=ZV.getBoundingClientRect();
+  if(!r.width)return;
+  ZV.width=Math.round(r.width*dpr); ZV.height=Math.round(r.height*dpr);
+  ZX.setTransform(dpr,0,0,dpr,0,0);
+  ZX.fillStyle="#EFF2F0"; ZX.fillRect(0,0,r.width,r.height);
+  const b=CAD.bbox; if(!b)return;
+  const sc=Math.min(r.width/(b[2]-b[0]),r.height/(b[3]-b[1]))*0.92;
+  const ox=(b[0]+b[2])/2-r.width/(2*sc), oy=(b[1]+b[3])/2-r.height/(2*sc);
+  const SX=x=>(x-ox)*sc, SY=y=>r.height-(y-oy)*sc;
+
+  ZX.strokeStyle="#C3CCC7"; ZX.lineWidth=.5; ZX.globalAlpha=.55; ZX.beginPath();
+  for(const e of CAD.ents){const L=CAD.layers[e.l];
+    if(!L||!L.vis||L.tag||!e.p)continue;
+    ZX.moveTo(SX(e.p[0]),SY(e.p[1]));
+    for(let k=2;k<e.p.length;k+=2)ZX.lineTo(SX(e.p[k]),SY(e.p[k+1]));}
+  ZX.stroke(); ZX.globalAlpha=1;
+
+  const marks=[];
+  S.prov.forEach((p,i)=>{
+    const col=ZC[i%ZC.length], dim=(S.sel!==null&&S.sel!==i);
+    ZX.globalAlpha=dim?0.22:1;
+    ZX.fillStyle=col+(dim?"18":"38"); ZX.strokeStyle=col; ZX.lineWidth=dim?.6:1.1;
+    p.pts.forEach(m=>{const e=m.e; if(!e.p)return;
+      ZX.beginPath(); ZX.moveTo(SX(e.p[0]),SY(e.p[1]));
+      for(let k=2;k<e.p.length;k+=2)ZX.lineTo(SX(e.p[k]),SY(e.p[k+1]));
+      ZX.closePath(); ZX.fill(); ZX.stroke();});
+    marks.push({i,col,x:SX(p.cx),y:SY(p.cy),dim});
+  });
+  ZX.globalAlpha=1;
+  marks.forEach(mk=>{
+    ZX.globalAlpha=mk.dim?0.35:1;
+    ZX.fillStyle="#FBFCFB"; ZX.beginPath(); ZX.arc(mk.x,mk.y,15,0,Math.PI*2); ZX.fill();
+    ZX.fillStyle=mk.col; ZX.beginPath(); ZX.arc(mk.x,mk.y,13,0,Math.PI*2); ZX.fill();
+    if(S.zones[mk.i]&&S.zones[mk.i].edited){
+      ZX.strokeStyle="#FBFCFB"; ZX.lineWidth=1.6; ZX.setLineDash([3,2.5]);
+      ZX.beginPath(); ZX.arc(mk.x,mk.y,17.5,0,Math.PI*2); ZX.stroke(); ZX.setLineDash([]);
+    }
+    ZX.fillStyle="#fff"; ZX.font="600 12px 'IBM Plex Mono',monospace";
+    ZX.textAlign="center"; ZX.textBaseline="middle";
+    ZX.fillText(String(mk.i+1),mk.x,mk.y);
+  });
+  ZX.globalAlpha=1;
+  ZV.onclick=ev=>{
+    const rr=ZV.getBoundingClientRect(), px=ev.clientX-rr.left, py=ev.clientY-rr.top;
+    let hit=null,bd=26*26;
+    marks.forEach(mk=>{const d=(px-mk.x)**2+(py-mk.y)**2; if(d<bd){bd=d;hit=mk.i;}});
+    S.sel=(hit===S.sel)?null:hit; render();
+  };
+  ZV.style.cursor="pointer";
+}
+
 /* ================= RAIL / CHROME ================= */
 function drawRail(){
   $("#rail").innerHTML = STEPS.map((s,i)=>{
@@ -397,19 +1006,69 @@ function stage0(){
       <div class="v">${n(S.rain.intensity)} mm/hr × ${n(S.rain.duration,2)} hr ÷ 1000 = <em>${n(rainM(),3)} m</em></div></div>
   </div></div>
 
-  <div class="panel"><h3>Client drawing</h3><div class="body">
-    <div class="drop ${S.uploaded?"has":""}" onclick="upload()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')upload()">
-      ${S.uploaded
-        ? `<span class="ico">DWG</span><p><b>MEGA_GREEN_CITY_LANDSCAPE_R3.dwg</b><br><span class="note">4.2 MB — layers read, zones ready to extract</span></p>`
-        : `<p><b>Drop the landscape drawing here</b><br><span class="note">DWG or DXF. Areas are read from closed boundaries by layer.</span></p>`}
+  <div class="panel">
+    <h3>Client drawing${CAD.loaded?` <span class="sub">${esc(CAD.name)} — ${(CAD.size/1048576).toFixed(1)} MB, ${CAD.note}</span>`:""}</h3>
+    ${(!CAD.loaded&&!CAD.parsing)?`<div class="body">
+      <input type="file" id="dxffile" accept=".dxf" style="display:none" onchange="onFile(event)">
+      <div class="drop" onclick="document.getElementById('dxffile').click()" role="button" tabindex="0"
+        onkeydown="if(event.key==='Enter')this.click()"
+        ondragover="event.preventDefault();this.classList.add('has')"
+        ondragleave="this.classList.remove('has')"
+        ondrop="event.preventDefault();onFile(event)">
+        <p><b>Drop the landscape drawing here</b><br>
+        <span class="note">DXF. Areas are read from closed boundaries, grouped by layer.</span></p>
+      </div>
+    </div>`:`
+    <div class="cad">
+      <div class="cadview">
+        <canvas id="cadcv"></canvas>
+        ${CAD.parsing?`<div class="cadbusy"><p>Reading drawing…</p><div class="bar"><i id="cadbar"></i></div></div>`:`
+        <div class="cadtools">
+          <button onclick="zoomExtents()">extents</button>
+          <button onclick="zoomTag('roof')">rooftop</button>
+          <button onclick="zoomTag('paved')">paved</button>
+          <button onclick="zoomTag('green')">green</button>
+          <button onclick="clearCAD()">remove</button>
+        </div>
+        <div class="cadstat" id="cadstat"></div>`}
+      </div>
+      <div class="cadlayers">
+        <h4>Layers ${CAD.loaded?`(${CAD.layers.length})`:""}</h4>
+        <div class="scrollers">
+          ${CAD.layers.filter(l=>l.n>0).sort((a,b)=>b.area-a.area).map(l=>{
+            const i=CAD.lidx[l.name];
+            return `<div class="lrow ${l.tag?"tag-"+l.tag:""}">
+              <button class="eye" data-on="${l.vis?1:0}" onclick="eyeLayer(${i})"
+                aria-label="Toggle ${esc(l.name)}"></button>
+              <div><div class="nm">${esc(l.name.trim()||"(unnamed)")}</div>
+                <div class="meta">${l.n} ent · ${l.cn} closed${l.cn?` · ${n(l.area/(CAD.upm*CAD.upm))} sqm`:""}</div>
+                ${l.cn?`<select onchange="tagLayer(${i},this.value)">
+                  <option value="" ${!l.tag?"selected":""}>— not catchment —</option>
+                  <option value="roof" ${l.tag==="roof"?"selected":""}>Rooftop</option>
+                  <option value="paved" ${l.tag==="paved"?"selected":""}>Paved</option>
+                  <option value="green" ${l.tag==="green"?"selected":""}>Green</option>
+                </select>`:""}
+              </div></div>`;}).join("")||`<div class="empty">No layers yet.</div>`}
+        </div>
+        <div class="cadfoot">
+          <div><span>Rooftop</span><span>${n(layerArea("roof"))} sqm</span></div>
+          <div><span>Paved</span><span>${n(layerArea("paved"))} sqm</span></div>
+          <div><span>Green</span><span>${n(layerArea("green"))} sqm</span></div>
+        </div>
+      </div>
+    </div>`}
+    <div class="body" ${(!CAD.loaded&&!CAD.parsing)?'style="padding-top:0"':""}>
+      <div class="grid3">
+        <div class="f"><label for="nt">RWH tanks required</label>
+          <input id="nt" type="number" min="1" max="12" value="${S.nTanks}" oninput="setTanks(+this.value)">
+          <div class="hint">The catchment is split into this many zones, one per tank.</div></div>
+      </div>
+      ${CAD.loaded&&layerArea("paved")===0?`<div class="check warn" style="margin-top:14px">
+        <span class="mark">!</span><span class="txt"><strong>No paved area tagged</strong>
+        <span>Roads are often drawn as open linework, which has no measurable area. Tag a layer as Paved, or enter the figure by hand on the next screen.</span></span></div>`:""}
     </div>
-    <div class="grid3" style="margin-top:16px">
-      <div class="f"><label for="nt">RWH tanks required</label>
-        <input id="nt" type="number" min="1" max="12" value="${S.nTanks}" oninput="setTanks(+this.value)">
-        <div class="hint">The drawing is split into this many zones, each draining to one tank.</div></div>
-    </div>
-  </div></div>`
-  + nav("Extract zones", S.uploaded && S.nTanks>0);
+  </div>`
+  + nav("Extract zones", S.nTanks>0 && !CAD.parsing);
 }
 
 /* ================= STAGE 1 — zones ================= */
@@ -427,11 +1086,35 @@ function stage1(){
   const tA=S.zones.reduce((a,z)=>a+potential(z).area,0);
   const tV=S.zones.reduce((a,z)=>a+potential(z).total,0);
 
+  const nar=narrate();
+  const chips=["Merge RWH-1 and RWH-2","Split RWH-2","Rebalance evenly",
+    "The layout is duplicated — halve it","Move paved to RWH-1","Re-cluster"];
+
   return head()+`
   <div class="check ${S.approved?"ok":"warn"}">
     <span class="mark">${S.approved?"✓":"!"}</span>
-    <span class="txt"><strong>${S.approved?"Zones approved":"Read from the drawing — not yet approved"}</strong>
-    <span>${S.approved?"Sizing will use these figures.":"Boundaries are picked up by layer, so anything untagged in the client's drawing lands short. Check each figure against the plan before approving."}</span></span></div>
+    <span class="txt"><strong>${S.approved?"Zones approved":"Proposed zoning — not yet approved"}</strong>
+    <span>${S.approved?"Sizing will use these figures."
+      :(nar||"Boundaries are picked up by layer, so anything untagged in the client's drawing lands short. Check each figure against the plan before approving.")}</span></span></div>
+
+  ${S.prov.length?`<div class="panel"><h3>How the zones were drawn
+    <span class="sub">colour shows which boundaries went to which tank</span></h3>
+    <div class="zonewrap">
+      <div class="zonemap"><canvas id="zonecv"></canvas></div>
+      <div class="zonekey">
+        ${S.zones.map((z,i)=>{
+          const p=S.prov[i]||{n:0,byLay:{}};
+          const top=Object.entries(p.byLay).sort((a,b)=>b[1]-a[1]).slice(0,3);
+          return `<div class="zk ${S.sel===i?"on":""} ${S.sel!==null&&S.sel!==i?"off":""}"
+              onclick="S.sel=(S.sel===${i}?null:${i});render()">
+            <span class="sw" style="background:${ZC[i%ZC.length]}"></span>
+            <div><b>${esc(z.name)}</b>${z.edited?` <span class="badge">edited</span>`:""}
+              <div class="meta">${n(p.n)} boundaries · ${n(potential(z).area)} sqm</div>
+              ${top.map(([l,a])=>`<div class="meta">${esc(l.trim())} — ${n(a)} sqm</div>`).join("")}
+            </div></div>`;}).join("")}
+      </div>
+    </div>
+  </div>`:""}
 
   <div class="panel"><h3>Zone areas <span class="sub">yellow cells are editable</span></h3>
     <div class="tblwrap"><table>
@@ -441,6 +1124,19 @@ function stage1(){
       <tfoot><tr><td>Total</td><td colspan="3"></td><td class="r">${n(tA)}</td><td class="r">${n(tV,2)}</td></tr></tfoot>
     </table></div>
   </div>
+
+  <div class="panel"><h3>Change the zoning</h3><div class="body">
+    <div class="promptbar">
+      <input id="zprompt" placeholder="Tell it what to change — merge RWH-1 and RWH-2, split RWH-3, move paved to RWH-1…"
+        onkeydown="if(event.key==='Enter')runPrompt()">
+      <button class="btn" onclick="runPrompt()">Apply</button>
+    </div>
+    <div class="choices" style="margin-top:10px">
+      ${chips.map(c=>`<button class="choice" onclick="document.getElementById('zprompt').value=${JSON.stringify(c).replace(/"/g,"&quot;")};runPrompt()">${esc(c)}</button>`).join("")}
+    </div>
+    ${S.log.length?`<div class="plog">${S.log.slice(0,6).map(l=>
+      `<div class="pl ${l.ok?"":"bad"}"><span class="q">${esc(l.t)}</span><span class="a">${esc(l.m)}</span></div>`).join("")}</div>`:""}
+  </div></div>
 
   <div class="actions">
     <button class="btn ghost" onclick="go(0)">Back</button>
@@ -771,28 +1467,41 @@ function autoGrid(id){
 function setC(which,k,v){ S[which][k]=v; render(); }
 function setTanks(v){
   v=Math.max(1,Math.min(12,v||1)); S.nTanks=v; S.approved=false;
-  const base=[[5755,15395,1035],[15958,8424,5112],[13083,13569,4445]];
   const out=[];
-  for(let i=0;i<v;i++){
-    const ex=S.zones[i];
-    const b=base[i%3], sc=1-(Math.floor(i/3)*0.18);
-    out.push(ex||{id:i+1,name:`RWH-${i+1}`,roof:Math.round(b[0]*sc),paved:Math.round(b[1]*sc),
-      green:Math.round(b[2]*sc),layers:4,nl:20,nw:9,bores:3,bdepth:30,invert:1.0});
+  if(CAD.loaded){
+    // split the tagged catchment evenly; the engineer redistributes on the next screen
+    const R=layerArea("roof")/v, P=layerArea("paved")/v, G=layerArea("green")/v;
+    for(let i=0;i<v;i++) out.push({id:i+1,name:`RWH-${i+1}`,roof:Math.round(R),
+      paved:Math.round(P),green:Math.round(G),layers:4,nl:0,nw:0,bores:3,bdepth:30,invert:1.0});
+  } else {
+    const base=[[5755,15395,1035],[15958,8424,5112],[13083,13569,4445]];
+    for(let i=0;i<v;i++){
+      const ex=S.zones[i], b=base[i%3], sc=1-(Math.floor(i/3)*0.18);
+      out.push(ex||{id:i+1,name:`RWH-${i+1}`,roof:Math.round(b[0]*sc),paved:Math.round(b[1]*sc),
+        green:Math.round(b[2]*sc),layers:4,nl:0,nw:0,bores:3,bdepth:30,invert:1.0});
+    }
   }
   S.zones=out.slice(0,v);
-  S.zones.forEach(z=>{ if(!z.nl||z.nl===20){const g=solveGrid(potential(z).total,z.layers);z.nl=g.nl;z.nw=g.nw;} });
+  S.zones.forEach(z=>{ if(!z.nl){const g=solveGrid(potential(z).total,z.layers);z.nl=g.nl;z.nw=g.nw;} });
   render("nt");
 }
-function upload(){ S.uploaded=!S.uploaded; render(); }
+function reseed(){ const v=S.nTanks; S.zones=[]; setTanks(v); }
 function approve(){ S.approved=true; S.zones.forEach(z=>{const g=solveGrid(potential(z).total,z.layers);z.nl=g.nl;z.nw=g.nw;}); go(2); }
 function reset(){ S.step=0; S.seen=0; S.approved=false; render(); }
-function go(i){ if(i>S.seen+1) return; S.step=i; S.seen=Math.max(S.seen,i); render(); window.scrollTo({top:0,behavior:"instant"}); }
+function go(i){
+  if(i>S.seen+1) return;
+  if(S.step===0 && i===1 && CAD.loaded && !S.approved){ S.log=[]; buildZones(); }
+  S.step=i; S.seen=Math.max(S.seen,i); render(); window.scrollTo({top:0,behavior:"instant"});
+}
 function render(focusId){
   S.seen=Math.max(S.seen,S.step); drawRail();
   $("#stage").innerHTML=[stage0,stage1,stage2,stage3,stage4,stage5,stage6][S.step]();
+  if(S.step===0) bindCAD();
+  if(S.step===1 && S.prov.length) requestAnimationFrame(drawZones);
   if(focusId){const el=document.getElementById(focusId);
     if(el){el.focus();if(el.setSelectionRange&&el.type!=="number"){const v=el.value;el.setSelectionRange(v.length,v.length);}}}
 }
+window.addEventListener("resize",()=>{ if(S.step===0&&CAD.loaded) drawCAD(); });
 render();
 </script>
 </body>
